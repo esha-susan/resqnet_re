@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from routes.health import health_bp
+from routes.auth import auth_bp
 from config import FLASK_PORT
 
 def create_app():
@@ -11,6 +12,7 @@ def create_app():
     
     # Register route blueprints
     app.register_blueprint(health_bp)
+    app.register_blueprint(auth_bp)   # NEW
     
     return app
 
