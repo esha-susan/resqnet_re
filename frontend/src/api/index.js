@@ -1,7 +1,4 @@
 // frontend/src/api/index.js
-// Updated: all API calls now attach the JWT token in the Authorization header
-// so Flask can verify who is making the request.
-
 import axios from 'axios'
 import { supabase } from './supabaseClient'
 
@@ -9,8 +6,7 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 })
 
-// Axios interceptor: automatically adds auth token to EVERY request
-// This means Person A never has to manually add headers — it's automatic
+// Auto-attach JWT token to every request
 API.interceptors.request.use(async (config) => {
   const { data: { session } } = await supabase.auth.getSession()
   if (session?.access_token) {
@@ -21,12 +17,28 @@ API.interceptors.request.use(async (config) => {
 
 // ── Health ──
 export const checkHealth = async () => {
-  const response = await API.get('/api/health')
-  return response.data
+  const res = await API.get('/api/health')
+  return res.data
 }
 
 // ── Auth ──
 export const getProfile = async () => {
-  const response = await API.get('/api/auth/profile')
-  return response.data
+  const res = await API.get('/api/auth/profile')
+  return res.data
+}
+
+// ── Incidents ──
+export const fetchIncidents = async () => {
+  const res = await API.get('/api/incidents')
+  return res.data
+}
+
+export const createIncident = async (incidentData) => {
+  const res = await API.post('/api/incidents', incidentData)
+  return res.data
+}
+
+export const updateIncidentStatus = async (id, status) => {
+  const res = await API.patch(`/api/incidents/${id}/status`, { status })
+  return res.data
 }
