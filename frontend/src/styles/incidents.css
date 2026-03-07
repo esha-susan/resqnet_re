@@ -251,3 +251,87 @@
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
   }
+  /* ── Phase 5: Priority Agent UI additions ── */
+
+.ai-notice {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    color: #a5b4fc;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  
+  /* Auto-assigned priority result box */
+  .priority-result-box {
+    background: var(--color-card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .priority-result-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.95rem;
+    color: var(--color-muted);
+  }
+  
+  .priority-result-badge {
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* reuse badge colors */
+  .badge-low      { background: rgba(46,204,113,0.15);  color: #2ecc71; }
+  .badge-medium   { background: rgba(243,156,18,0.15);  color: #f39c12; }
+  .badge-high     { background: rgba(230,126,34,0.15);  color: #e67e22; }
+  .badge-critical { background: rgba(231,76,60,0.15);   color: #e74c3c; }
+  
+  .override-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .override-label {
+    font-size: 0.82rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+  
+  .override-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .override-btn {
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent;
+    color: var(--color-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .override-btn:hover { opacity: 0.85; }
+  
+  .override-btn-low.active      { border-color: #2ecc71; color: #2ecc71; }
+  .override-btn-medium.active   { border-color: #f39c12; color: #f39c12; }
+  .override-btn-high.active     { border-color: #e67e22; color: #e67e22; }
+  .override-btn-critical.active { border-color: #e74c3c; color: #e74c3c; }

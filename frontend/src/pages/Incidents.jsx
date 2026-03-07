@@ -1,12 +1,9 @@
 // frontend/src/pages/Incidents.jsx
-// Updated to include the SpeechRecorder component above the description field.
-// When a transcript comes back, it auto-fills the description textarea.
-
 import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import IncidentCard from '../components/IncidentCard'
-import SpeechRecorder from '../components/SpeechRecorder'   // ← NEW
-import { fetchIncidents, createIncident } from '../api/index'
+import SpeechRecorder from '../components/SpeechRecorder'
+import { fetchIncidents, createIncident, updateIncidentPriority } from '../api/index'
 import '../styles/incidents.css'
 import '../styles/speech.css'
 
@@ -22,7 +19,11 @@ function Incidents() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [location, setLocation] = useState('')
-  const [priority, setPriority] = useState('Medium')
+
+  const [autoPriority, setAutoPriority] = useState(null)
+  const [overridePriority, setOverridePriority] = useState(null)
+  const [showOverride, setShowOverride] = useState(false)
+  const [lastCreatedId, setLastCreatedId] = useState(null)
 
   useEffect(() => { loadIncidents() }, [])
 
@@ -38,32 +39,62 @@ function Incidents() {
     }
   }
 
-  // ← NEW: called by SpeechRecorder when transcript is ready
   const handleTranscript = (text) => {
-    setDescription(text)    // Auto-fills the description textarea
+    setDescription(text)
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
+    setAutoPriority(null)
+    setOverridePriority(null)
+    setShowOverride(false)
     setSubmitting(true)
 
     try {
       const newIncident = await createIncident({
-        title, description, location, priority
+        title,
+        description,
+        location,
       })
+
+      setAutoPriority(newIncident.priority)
+      setLastCreatedId(newIncident.id)
+      setShowOverride(true)
+
       setIncidents(prev => [newIncident, ...prev])
+
       setTitle('')
       setDescription('')
       setLocation('')
-      setPriority('Medium')
-      setSuccess('✅ Incident reported successfully')
-      setTimeout(() => setSuccess(''), 3000)
+
+      setSuccess(`✅ Incident reported — Priority auto-assigned: ${newIncident.priority}`)
+      setTimeout(() => setSuccess(''), 5000)
+
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to create incident')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleOverride = async (newPriority) => {
+    if (!lastCreatedId) return
+
+    try {
+      const updated = await updateIncidentPriority(lastCreatedId, newPriority)
+
+      setIncidents(prev =>
+        prev.map(inc => inc.id === lastCreatedId ? updated : inc)
+      )
+
+      setOverridePriority(newPriority)
+      setSuccess(`✅ Priority updated to: ${newPriority}`)
+      setTimeout(() => setSuccess(''), 3000)
+
+    } catch {
+      setError('Failed to update priority')
     }
   }
 
@@ -74,10 +105,39 @@ function Incidents() {
 
         <section className="incident-form-section">
           <h2>🚨 Report New Incident</h2>
-          <p className="section-sub">Submit a new disaster or emergency event</p>
+          <p className="section-sub">
+            Priority is automatically assigned by the AI — you can override it after submission
+          </p>
 
           {error && <div className="form-error">{error}</div>}
           {success && <div className="form-success">{success}</div>}
+
+          {showOverride && autoPriority && (
+            <div className="priority-result-box">
+              <div className="priority-result-header">
+                <span>🤖 AI assigned priority:</span>
+                <span className={`priority-result-badge badge-${autoPriority.toLowerCase()}`}>
+                  {overridePriority || autoPriority}
+                </span>
+              </div>
+              <div className="override-section">
+                <span className="override-label">Override if incorrect:</span>
+                <div className="override-buttons">
+                  {PRIORITIES.map(p => (
+                    <button
+                      key={p}
+                      type="button"
+                      className={`override-btn override-btn-${p.toLowerCase()} 
+                        ${(overridePriority || autoPriority) === p ? 'active' : ''}`}
+                      onClick={() => handleOverride(p)}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="incident-form">
             <div className="form-row">
@@ -103,7 +163,6 @@ function Incidents() {
               </div>
             </div>
 
-            {/* ── Speech Recorder sits above description ── */}
             <SpeechRecorder
               onTranscript={handleTranscript}
               disabled={submitting}
@@ -112,7 +171,7 @@ function Incidents() {
             <div className="form-group">
               <label>Description * (or use Voice Report above)</label>
               <textarea
-                placeholder="Describe what is happening in detail..."
+                placeholder="Describe what is happening... The AI will auto-assign priority based on your description."
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 rows={4}
@@ -120,20 +179,8 @@ function Incidents() {
               />
             </div>
 
-            <div className="form-group priority-select-group">
-              <label>Priority Level</label>
-              <div className="priority-buttons">
-                {PRIORITIES.map(p => (
-                  <button
-                    key={p}
-                    type="button"
-                    className={`priority-btn priority-btn-${p.toLowerCase()} ${priority === p ? 'selected' : ''}`}
-                    onClick={() => setPriority(p)}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
+            <div className="ai-notice">
+              🤖 Priority will be automatically determined from your description
             </div>
 
             <button
@@ -141,7 +188,7 @@ function Incidents() {
               className="submit-incident-btn"
               disabled={submitting}
             >
-              {submitting ? 'Reporting...' : '🚨 Report Incident'}
+              {submitting ? 'Analyzing & Reporting...' : '🚨 Report Incident'}
             </button>
           </form>
         </section>
