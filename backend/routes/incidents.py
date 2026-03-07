@@ -1,11 +1,13 @@
 from flask import Blueprint, jsonify, request
 from middleware.auth_middleware import require_auth
+
 from services.incident_service import (
     create_incident,
     get_all_incidents,
-    get_incident_by_id,
-    update_incident_status
+    update_incident_priority
 )
+
+from agents.priority_agent import analyze_incident
 
 incidents_bp = Blueprint('incidents', __name__)
 
@@ -16,25 +18,32 @@ def create():
 
     body = request.get_json()
 
-    required = ['title', 'description', 'location', 'priority']
+    required = ['title', 'description', 'location']
     missing = [f for f in required if not body.get(f)]
 
     if missing:
-        return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
+        return jsonify({"error": f"Missing fields: {missing}"}), 400
 
     try:
+
+        priority_result = analyze_incident(
+            body['title'],
+            body['description']
+        )
+
+        final_priority = priority_result['priority']
+
         incident = create_incident(
             title=body['title'],
             description=body['description'],
             location=body['location'],
-            priority=body['priority'],
+            priority=final_priority,
             user_id=request.current_user.id
         )
 
-        return jsonify(incident), 201
+        incident['auto_priority'] = priority_result
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify(incident), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -44,46 +53,21 @@ def create():
 @require_auth
 def get_all():
 
-    try:
-        incidents = get_all_incidents()
-        return jsonify(incidents), 200
+    incidents = get_all_incidents()
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify(incidents), 200
 
 
-@incidents_bp.route('/api/incidents/<incident_id>', methods=['GET'])
+@incidents_bp.route('/api/incidents/<incident_id>/priority', methods=['PATCH'])
 @require_auth
-def get_one(incident_id):
-
-    try:
-        incident = get_incident_by_id(incident_id)
-
-        if not incident:
-            return jsonify({"error": "Incident not found"}), 404
-
-        return jsonify(incident), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@incidents_bp.route('/api/incidents/<incident_id>/status', methods=['PATCH'])
-@require_auth
-def update_status(incident_id):
+def update_priority(incident_id):
 
     body = request.get_json()
-    status = body.get('status')
+    priority = body.get('priority')
 
-    if not status:
-        return jsonify({"error": "Missing field: status"}), 400
+    if not priority:
+        return jsonify({"error": "priority required"}), 400
 
-    try:
-        updated = update_incident_status(incident_id, status)
-        return jsonify(updated), 200
+    updated = update_incident_priority(incident_id, priority)
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify(updated), 200
