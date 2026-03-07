@@ -9,6 +9,7 @@ from routes.auth import auth_bp
 from routes.incidents import incidents_bp
 from routes.speech import speech_bp
 from config import FLASK_PORT
+from routes.resources import resources_bp
 
 def create_app():
     app = Flask(__name__)
@@ -24,6 +25,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(incidents_bp)
     app.register_blueprint(speech_bp)
+    app.register_blueprint(resources_bp)
 
     return app
 
