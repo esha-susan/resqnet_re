@@ -1,48 +1,48 @@
 // frontend/src/pages/Incidents.jsx
-// Main incidents page with two sections:
-//   1. Form to create a new incident (top)
-//   2. Live list of all incidents (below)
+// Updated to include the SpeechRecorder component above the description field.
+// When a transcript comes back, it auto-fills the description textarea.
 
 import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import IncidentCard from '../components/IncidentCard'
+import SpeechRecorder from '../components/SpeechRecorder'   // ← NEW
 import { fetchIncidents, createIncident } from '../api/index'
 import '../styles/incidents.css'
+import '../styles/speech.css'
 
 const PRIORITIES = ['Low', 'Medium', 'High', 'Critical']
 
 function Incidents() {
-  // ── State ──
   const [incidents, setIncidents] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  // Form fields
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [location, setLocation] = useState('')
   const [priority, setPriority] = useState('Medium')
 
-  // ── Load incidents on page mount ──
-  useEffect(() => {
-    loadIncidents()
-  }, [])
+  useEffect(() => { loadIncidents() }, [])
 
   const loadIncidents = async () => {
     try {
       setLoading(true)
       const data = await fetchIncidents()
       setIncidents(data)
-    } catch (err) {
+    } catch {
       setError('Failed to load incidents')
     } finally {
       setLoading(false)
     }
   }
 
-  // ── Submit new incident ──
+  // ← NEW: called by SpeechRecorder when transcript is ready
+  const handleTranscript = (text) => {
+    setDescription(text)    // Auto-fills the description textarea
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -51,25 +51,15 @@ function Incidents() {
 
     try {
       const newIncident = await createIncident({
-        title,
-        description,
-        location,
-        priority,
+        title, description, location, priority
       })
-
-      // Prepend new incident to top of list (no need to refetch)
       setIncidents(prev => [newIncident, ...prev])
-
-      // Clear form
       setTitle('')
       setDescription('')
       setLocation('')
       setPriority('Medium')
       setSuccess('✅ Incident reported successfully')
-
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000)
-
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to create incident')
     } finally {
@@ -82,7 +72,6 @@ function Incidents() {
       <Navbar />
       <div className="incidents-container">
 
-        {/* ── Report Form ── */}
         <section className="incident-form-section">
           <h2>🚨 Report New Incident</h2>
           <p className="section-sub">Submit a new disaster or emergency event</p>
@@ -102,7 +91,6 @@ function Incidents() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label>Location *</label>
                 <input
@@ -115,8 +103,14 @@ function Incidents() {
               </div>
             </div>
 
+            {/* ── Speech Recorder sits above description ── */}
+            <SpeechRecorder
+              onTranscript={handleTranscript}
+              disabled={submitting}
+            />
+
             <div className="form-group">
-              <label>Description *</label>
+              <label>Description * (or use Voice Report above)</label>
               <textarea
                 placeholder="Describe what is happening in detail..."
                 value={description}
@@ -152,7 +146,6 @@ function Incidents() {
           </form>
         </section>
 
-        {/* ── Incident List ── */}
         <section className="incident-list-section">
           <div className="list-header">
             <h2>📋 Active Incidents</h2>
