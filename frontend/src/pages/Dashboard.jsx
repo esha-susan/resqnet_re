@@ -18,13 +18,12 @@ function Dashboard() {
         </div>
 
         <div className="dashboard-grid">
-          {/* Clicking the card navigates to /incidents */}
           <div className="dash-card" onClick={() => navigate('/incidents')}>
             <span className="dash-icon">📋</span>
             <h3>Incidents</h3>
             <p>Report and manage active incidents</p>
           </div>
-          <div className="dash-card">
+          <div className="dash-card" onClick={() => navigate('/resources')}>
             <span className="dash-icon">🚑</span>
             <h3>Resources</h3>
             <p>Track ambulances, fire trucks, and more</p>

@@ -42,7 +42,6 @@ export const updateIncidentStatus = async (id, status) => {
   return res.data
 }
 
-// ← NEW: override auto-assigned priority
 export const updateIncidentPriority = async (id, priority) => {
   const res = await API.patch(`/api/incidents/${id}/priority`, { priority })
   return res.data
@@ -56,5 +55,30 @@ export const transcribeAudio = async (audioBlob, incidentId = null) => {
   const res = await API.post('/api/speech/transcribe', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
+  return res.data
+}
+
+// ── Resources ──
+export const fetchResources = async (status = null) => {
+  const url = status ? `/api/resources?status=${status}` : '/api/resources'
+  const res = await API.get(url)
+  return res.data
+}
+
+export const fetchIncidentResources = async (incidentId) => {
+  const res = await API.get(`/api/resources/incident/${incidentId}`)
+  return res.data
+}
+
+export const releaseResource = async (resourceId, incidentId) => {
+  const res = await API.post('/api/resources/release', {
+    resource_id: resourceId,
+    incident_id: incidentId
+  })
+  return res.data
+}
+
+export const releaseAllResources = async (incidentId) => {
+  const res = await API.post(`/api/resources/release-all/${incidentId}`)
   return res.data
 }

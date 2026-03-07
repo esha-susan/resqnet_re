@@ -1,0 +1,186 @@
+/* frontend/src/styles/resources.css */
+
+.resources-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .resources-header {
+    margin-bottom: 2rem;
+  }
+  
+  .resources-header h2 {
+    font-size: 1.4rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  /* ── Summary Bar ── */
+  .resource-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .summary-card {
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+  }
+  
+  .summary-card.available {
+    border-color: rgba(46, 204, 113, 0.3);
+  }
+  
+  .summary-card.busy {
+    border-color: rgba(231, 76, 60, 0.3);
+  }
+  
+  .summary-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  
+  .summary-card.available .summary-number { color: #2ecc71; }
+  .summary-card.busy .summary-number      { color: #e74c3c; }
+  
+  .summary-label {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+  
+  /* ── Filters ── */
+  .resource-filters {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+  }
+  
+  .filter-tab {
+    background: var(--color-card);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--color-muted);
+    padding: 0.5rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .filter-tab.active,
+  .filter-tab:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  .refresh-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--color-muted);
+    padding: 0.5rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-left: auto;
+    transition: all 0.2s;
+  }
+  
+  .refresh-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  /* ── Resource Grid ── */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  
+  .resource-card {
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  
+  .resource-card.available {
+    border-color: rgba(46, 204, 113, 0.2);
+  }
+  
+  .resource-card.busy {
+    border-color: rgba(231, 76, 60, 0.2);
+  }
+  
+  .resource-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  
+  .resource-info {
+    flex: 1;
+  }
+  
+  .resource-info h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.03em;
+  }
+  
+  .resource-location {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+  
+  .resource-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+  
+  .resource-status-dot.available { background: #2ecc71; }
+  .resource-status-dot.busy      { background: #e74c3c; }
+  
+  .resource-status-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+  }
+  
+  .resource-status-text.available { color: #2ecc71; }
+  .resource-status-text.busy      { color: #e74c3c; }
+  
+  /* ── Resource Badge (used in IncidentCard) ── */
+  .resource-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+  
+  .resource-badge-available {
+    background: rgba(46,204,113,0.15);
+    color: #2ecc71;
+  }
+  
+  .resource-badge-busy {
+    background: rgba(231,76,60,0.15);
+    color: #e74c3c;
+  }

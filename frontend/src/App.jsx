@@ -4,7 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
-import Incidents from './pages/Incidents'     // ← NEW
+import Incidents from './pages/Incidents'
+import Resources from './pages/Resources'     // ← NEW
 import Home from './pages/Home'
 
 function ProtectedRoute({ children }) {
@@ -21,8 +22,11 @@ function AppRoutes() {
       <Route path="/dashboard" element={
         <ProtectedRoute><Dashboard /></ProtectedRoute>
       }/>
-      <Route path="/incidents" element={        
+      <Route path="/incidents" element={
         <ProtectedRoute><Incidents /></ProtectedRoute>
+      }/>
+      <Route path="/resources" element={
+        <ProtectedRoute><Resources /></ProtectedRoute>
       }/>
     </Routes>
   )
