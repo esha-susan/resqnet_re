@@ -82,3 +82,10 @@ export const releaseAllResources = async (incidentId) => {
   const res = await API.post(`/api/resources/release-all/${incidentId}`)
   return res.data
 }
+// Add this to the bottom of your existing api/index.js
+
+// ── Twilio ──
+export const fetchCallLogs = async (incidentId) => {
+  const res = await API.get(`/api/twilio/call-logs/${incidentId}`)
+  return res.data
+}
