@@ -13,6 +13,7 @@ from services.resource_service import (
     release_all_incident_resources,
     get_unreleased_resources
 )
+from agents.report_agent import generate_report    # ← NEW
 
 incidents_bp = Blueprint('incidents', __name__)
 
@@ -117,33 +118,40 @@ def update_priority(incident_id):
 @require_auth
 def close_incident(incident_id):
     """
-    Closes an incident.
-    First releases all remaining resources.
-    Then sets status to closed.
-    Report agent will be triggered in Phase 9.
+    Closes incident:
+    1. Releases all resources
+    2. Sets status to closed
+    3. Triggers Report Agent automatically
     """
     try:
-        # Check if incident exists
         incident = get_incident_by_id(incident_id)
         if not incident:
             return jsonify({"error": "Incident not found"}), 404
 
-        # Check if already closed
         if incident['status'] == 'closed':
             return jsonify({"error": "Incident is already closed"}), 400
 
-        # Release all remaining resources
+        # Step 1: Release all resources
         released_count = release_all_incident_resources(incident_id)
 
-        # Close the incident
+        # Step 2: Close the incident
         closed = update_incident_status(incident_id, 'closed')
+
+        # Step 3: Generate report automatically
+        report = None
+        try:
+            report = generate_report(incident_id)
+        except Exception as e:
+            # Don't crash if report fails — incident is still closed
+            print(f"⚠️ Report generation failed: {e}")
 
         return jsonify({
             "incident": closed,
             "resources_released": released_count,
+            "report_generated": report is not None,
+            "report_id": report["id"] if report else None,
             "message": f"Incident closed. {released_count} resources released."
         }), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
