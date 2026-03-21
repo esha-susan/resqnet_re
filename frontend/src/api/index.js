@@ -105,3 +105,16 @@ export const fetchCallLogs = async (incidentId) => {
   const res = await API.get(`/api/twilio/call-logs/${incidentId}`)
   return res.data
 }
+// Add to bottom of existing api/index.js
+// Add to bottom of existing api/index.js
+
+// ── Reports ──
+export const fetchReports = async () => {
+  const res = await API.get('/api/reports')
+  return res.data
+}
+
+export const fetchReportByIncident = async (incidentId) => {
+  const res = await API.get(`/api/reports/${incidentId}`)
+  return res.data
+}

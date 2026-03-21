@@ -83,10 +83,19 @@ def generate_summary(incident: dict, resources: list, calls: list) -> str:
     confirmed_calls = len([c for c in calls if c.get("status") == "confirmed"])
     total_calls = len(calls)
 
+    # Fix: correct grammar for singular/plural
+    if total_resources == 1:
+        resource_text = f"1 resource unit was deployed"
+    else:
+        resource_text = f"{total_resources} resource units were deployed"
+
+    resource_types_text = (
+        ', '.join(resource_types) if resource_types else 'various units'
+    )
+
     summary = (
         f"A {priority} priority incident '{title}' was reported at {location}. "
-        f"{total_resources} resource unit{'s' if total_resources != 1 else ''} "
-        f"were deployed including {', '.join(resource_types) if resource_types else 'various units'}. "
+        f"{resource_text} including {resource_types_text}. "
     )
 
     if total_calls > 0:
@@ -95,11 +104,12 @@ def generate_summary(incident: dict, resources: list, calls: list) -> str:
             f"responder{'s' if total_calls != 1 else ''} confirmed availability. "
         )
 
-    summary += "The incident has been successfully resolved and all resources have been released."
+    summary += (
+        "The incident has been successfully resolved "
+        "and all resources have been released."
+    )
 
     return summary
-
-
 def generate_report(incident_id: str) -> dict:
     """
     Main entry point for the Report Agent.

@@ -5,8 +5,9 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Incidents from './pages/Incidents'
-import IncidentView from './pages/IncidentView'    // ← NEW
+import IncidentView from './pages/IncidentView'
 import Resources from './pages/Resources'
+import Reports from './pages/Reports'              // ← NEW
 import Home from './pages/Home'
 
 function ProtectedRoute({ children }) {
@@ -31,6 +32,9 @@ function AppRoutes() {
       }/>
       <Route path="/resources" element={
         <ProtectedRoute><Resources /></ProtectedRoute>
+      }/>
+      <Route path="/reports" element={
+        <ProtectedRoute><Reports /></ProtectedRoute>
       }/>
     </Routes>
   )

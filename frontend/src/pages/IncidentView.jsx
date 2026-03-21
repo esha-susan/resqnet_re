@@ -61,7 +61,6 @@ function IncidentView() {
       await releaseResource(resourceId, id)
       setSuccess('✅ Resource released successfully')
       setTimeout(() => setSuccess(''), 3000)
-      // Reload resources
       const updated = await fetchIncidentResources(id)
       setResources(updated)
     } catch {
@@ -91,8 +90,12 @@ function IncidentView() {
     }
   }
 
-  const formatDate = (iso) => new Date(iso).toLocaleString()
+  const formatDate = (iso) => {
+    if (!iso) return 'Unknown'
+    return new Date(iso).toLocaleString()
+  }
 
+  // ── Loading state ──
   if (loading) {
     return (
       <div>
@@ -104,6 +107,7 @@ function IncidentView() {
     )
   }
 
+  // ── Not found state ──
   if (!incident) {
     return (
       <div>
@@ -236,9 +240,18 @@ function IncidentView() {
           </div>
         )}
 
+        {/* ── Closed Banner + View Report ── */}
         {incident.status === 'closed' && (
-          <div className="iv-closed-banner">
-            ✅ This incident has been closed and all resources released.
+          <div className="iv-closed-section">
+            <div className="iv-closed-banner">
+              ✅ This incident has been closed and all resources released.
+            </div>
+            <button
+              className="iv-view-report-btn"
+              onClick={() => navigate('/reports')}
+            >
+              📊 View Report
+            </button>
           </div>
         )}
 

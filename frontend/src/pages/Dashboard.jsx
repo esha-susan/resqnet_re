@@ -28,12 +28,12 @@ function Dashboard() {
             <h3>Resources</h3>
             <p>Track ambulances, fire trucks, and more</p>
           </div>
-          <div className="dash-card">
+          <div className="dash-card" onClick={() => navigate('/incidents')}>
             <span className="dash-icon">🎙️</span>
             <h3>Speech Report</h3>
             <p>Submit audio disaster reports</p>
           </div>
-          <div className="dash-card">
+          <div className="dash-card" onClick={() => navigate('/reports')}>
             <span className="dash-icon">📊</span>
             <h3>Reports</h3>
             <p>View closed incident reports</p>

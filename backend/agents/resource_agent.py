@@ -53,7 +53,7 @@ def assign_resource(resource_id: str, incident_id: str) -> dict:
 def allocate_resources(incident_id: str, priority: str,
                        incident_title: str = "Incident",
                        incident_location: str = "Unknown",
-                       incident_description: str = "No description provided") -> dict:
+                       incident_description: str = "") -> dict:
     """
     Allocates resources and triggers Twilio calls with full incident details.
     """
@@ -89,13 +89,13 @@ def allocate_resources(incident_id: str, priority: str,
     try:
         from agents.twilio_agent import call_all_responders
         call_results = call_all_responders(
-            incident_id=incident_id,
-            assigned_resources=assigned,
-            incident_title=incident_title,
-            incident_location=incident_location,
-            incident_description=incident_description,
-            priority=priority
-        )
+        incident_id=incident_id,
+        assigned_resources=assigned,
+        incident_title=incident_title,
+        incident_location=incident_location,
+        priority=priority,
+        incident_description=incident_description
+    )
     except Exception as e:
         print(f"⚠️ Twilio calling failed: {e}")
 

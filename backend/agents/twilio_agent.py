@@ -33,6 +33,21 @@ def log_call(incident_id, resource_id, responder, call_sid):
     }).execute()
 
 
+def clean_text(text: str) -> str:
+    """
+    Cleans text for safe use inside TwiML XML.
+    Removes characters that could break the XML structure.
+    """
+    return (
+        str(text)
+        .replace("'", "")
+        .replace("&", "and")
+        .replace("<", "")
+        .replace(">", "")
+        .replace('"', "")
+    )
+
+
 def make_responder_call(
     incident_id: str,
     resource_id: str,
@@ -42,6 +57,10 @@ def make_responder_call(
     incident_description: str,
     priority: str
 ) -> dict:
+    """
+    Makes a single call to a responder for a specific resource type.
+    Reads out full incident details including description.
+    """
     responder = get_responder_for_resource_type(resource_type)
 
     if not responder:
@@ -52,11 +71,12 @@ def make_responder_call(
 
     webhook_url = f"{NGROK_URL}/api/twilio/response"
 
-    clean_title = incident_title.replace("'", "").replace("&", "and").replace("<", "").replace(">", "")
-    clean_location = incident_location.replace("'", "").replace("&", "and").replace("<", "").replace(">", "")
-    clean_description = incident_description.replace("'", "").replace("&", "and").replace("<", "").replace(">", "")
-    clean_priority = priority.replace("'", "")
-    clean_type = resource_type.replace("_", " ")
+    # Clean all text fields before putting them in XML
+    c_title       = clean_text(incident_title)
+    c_location    = clean_text(incident_location)
+    c_description = clean_text(incident_description)
+    c_priority    = clean_text(priority)
+    c_type        = clean_text(resource_type.replace("_", " "))
 
     twiml_message = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -77,11 +97,11 @@ def make_responder_call(
     </Say>
 </Response>""".format(
         webhook=webhook_url,
-        priority=clean_priority,
-        title=clean_title,
-        description=clean_description,
-        location=clean_location,
-        resource=clean_type
+        priority=c_priority,
+        title=c_title,
+        description=c_description,
+        location=c_location,
+        resource=c_type
     )
 
     try:
@@ -107,21 +127,28 @@ def make_responder_call(
         }
 
 
-def call_all_responders(incident_id: str, assigned_resources: list,
-                        incident_title: str, incident_location: str,
-                        incident_description: str,
-                        priority: str) -> list:
+def call_all_responders(
+    incident_id: str,
+    assigned_resources: list,
+    incident_title: str,
+    incident_location: str,
+    priority: str,
+    incident_description: str = ""
+) -> list:
     """
-    Makes ONE call per incident summarizing all assigned resources.
-    Includes full incident description in the call message.
+    Makes ONE call per incident regardless of how many resources assigned.
+    Summarizes ALL assigned resource types in a single call message.
+    Reads out the full incident description.
     """
     if not assigned_resources:
         return []
 
+    # Build summary of all resource types
     resource_types = list(set([r["type"] for r in assigned_resources]))
     resources_text = ", ".join([r.replace("_", " ") for r in resource_types])
     total = len(assigned_resources)
 
+    # Get responder phone from first resource type
     responder = get_responder_for_resource_type(assigned_resources[0]["type"])
 
     if not responder:
@@ -129,11 +156,12 @@ def call_all_responders(incident_id: str, assigned_resources: list,
 
     webhook_url = f"{NGROK_URL}/api/twilio/response"
 
-    clean_title = incident_title.replace("'", "").replace("&", "and").replace("<", "").replace(">", "")
-    clean_location = incident_location.replace("'", "").replace("&", "and").replace("<", "").replace(">", "")
-    clean_description = incident_description.replace("'", "").replace("&", "and").replace("<", "").replace(">", "")
-    clean_priority = priority.replace("'", "")
-    resources_summary = f"{total} units including {resources_text}"
+    # Clean all fields
+    c_title       = clean_text(incident_title)
+    c_location    = clean_text(incident_location)
+    c_description = clean_text(incident_description)
+    c_priority    = clean_text(priority)
+    c_resources   = clean_text(f"{total} units including {resources_text}")
 
     twiml_message = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -154,11 +182,11 @@ def call_all_responders(incident_id: str, assigned_resources: list,
     </Say>
 </Response>""".format(
         webhook=webhook_url,
-        priority=clean_priority,
-        title=clean_title,
-        description=clean_description,
-        location=clean_location,
-        resources=resources_summary
+        priority=c_priority,
+        title=c_title,
+        description=c_description,
+        location=c_location,
+        resources=c_resources
     )
 
     try:

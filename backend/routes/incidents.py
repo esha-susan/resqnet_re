@@ -47,7 +47,8 @@ def create():
             incident_id=incident['id'],
             priority=final_priority,
             incident_title=body['title'],
-            incident_location=body['location']
+            incident_location=body['location'],
+            incident_description=body['description']
         )
 
         incident['auto_priority'] = priority_result
