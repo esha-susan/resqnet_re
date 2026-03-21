@@ -1,11 +1,12 @@
-# backend/routes/resources.py
 from flask import Blueprint, jsonify, request
 from middleware.auth_middleware import require_auth
 from services.resource_service import (
     get_all_resources,
     get_resources_by_status,
     release_resource,
-    release_all_incident_resources
+    release_all_incident_resources,
+    get_unreleased_resources,
+    get_all_incident_resources
 )
 from agents.resource_agent import (
     allocate_resources,
@@ -32,8 +33,20 @@ def get_all():
 @resources_bp.route('/incident/<incident_id>', methods=['GET'])
 @require_auth
 def get_for_incident(incident_id):
+    """Returns active (unreleased) resources for an incident."""
     try:
-        data = get_incident_resources(incident_id)
+        data = get_unreleased_resources(incident_id)
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@resources_bp.route('/incident/<incident_id>/all', methods=['GET'])
+@require_auth
+def get_all_for_incident(incident_id):
+    """Returns ALL resources ever assigned to an incident."""
+    try:
+        data = get_all_incident_resources(incident_id)
         return jsonify(data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -59,6 +72,7 @@ def allocate():
 @resources_bp.route('/release', methods=['POST'])
 @require_auth
 def release():
+    """Release a single resource from an incident."""
     body = request.get_json()
     resource_id = body.get('resource_id')
     incident_id = body.get('incident_id')
@@ -76,6 +90,7 @@ def release():
 @resources_bp.route('/release-all/<incident_id>', methods=['POST'])
 @require_auth
 def release_all(incident_id):
+    """Release ALL resources from an incident."""
     try:
         count = release_all_incident_resources(incident_id)
         return jsonify({
