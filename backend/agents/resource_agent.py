@@ -1,18 +1,4 @@
 # backend/agents/resource_agent.py
-# THE RESOURCE ALLOCATION AGENT
-#
-# Responsibility:
-#   - Decide what resources an incident needs
-#   - Find available units in the database
-#   - Assign them and mark them as busy
-#   - Link them to the incident in incident_resources table
-#
-# Resource rules by priority:
-#   Critical → ambulance(2) + fire_truck(2) + doctor(2) + police(2)
-#   High     → ambulance(2) + fire_truck(1) + doctor(1)
-#   Medium   → ambulance(1) + doctor(1)
-#   Low      → police(1)
-
 from services import supabase
 from datetime import datetime
 
@@ -39,7 +25,6 @@ RESOURCE_RULES = {
 
 
 def get_available_resources(resource_type: str, quantity: int) -> list:
-
     response = (
         supabase.table("resources")
         .select("*")
@@ -52,7 +37,6 @@ def get_available_resources(resource_type: str, quantity: int) -> list:
 
 
 def assign_resource(resource_id: str, incident_id: str) -> dict:
-
     supabase.table("resources").update({
         "status": "busy"
     }).eq("id", resource_id).execute()
@@ -66,15 +50,19 @@ def assign_resource(resource_id: str, incident_id: str) -> dict:
     return response.data[0] if response.data else {}
 
 
-def allocate_resources(incident_id: str, priority: str) -> dict:
-
+def allocate_resources(incident_id: str, priority: str,
+                       incident_title: str = "Incident",
+                       incident_location: str = "Unknown",
+                       incident_description: str = "No description provided") -> dict:
+    """
+    Allocates resources and triggers Twilio calls with full incident details.
+    """
     requirements = RESOURCE_RULES.get(priority, RESOURCE_RULES["Low"])
 
     assigned = []
     unavailable = []
 
     for resource_type, quantity_needed in requirements.items():
-
         available = get_available_resources(resource_type, quantity_needed)
 
         if not available:
@@ -89,21 +77,37 @@ def allocate_resources(incident_id: str, priority: str) -> dict:
                 "location": resource.get("location", "Unknown")
             })
 
+    # Update incident status to in_progress
     if assigned:
         supabase.table("incidents").update({
             "status": "in_progress",
             "updated_at": datetime.utcnow().isoformat()
         }).eq("id", incident_id).execute()
 
+    # Trigger Twilio calls
+    call_results = []
+    try:
+        from agents.twilio_agent import call_all_responders
+        call_results = call_all_responders(
+            incident_id=incident_id,
+            assigned_resources=assigned,
+            incident_title=incident_title,
+            incident_location=incident_location,
+            incident_description=incident_description,
+            priority=priority
+        )
+    except Exception as e:
+        print(f"⚠️ Twilio calling failed: {e}")
+
     return {
         "assigned": assigned,
         "unavailable": unavailable,
-        "total_assigned": len(assigned)
+        "total_assigned": len(assigned),
+        "calls": call_results
     }
 
 
 def get_incident_resources(incident_id: str) -> list:
-
     response = (
         supabase.table("incident_resources")
         .select("*, resources(*)")

@@ -14,4 +14,4 @@ frontend/.env
 
 # System
 .DS_Store
-*.log
+*.logbackend/temp_audio/
