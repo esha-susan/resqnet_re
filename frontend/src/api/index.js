@@ -47,6 +47,16 @@ export const updateIncidentPriority = async (id, priority) => {
   return res.data
 }
 
+export const closeIncident = async (id) => {
+  const res = await API.post(`/api/incidents/${id}/close`)
+  return res.data
+}
+
+export const fetchIncidentById = async (id) => {
+  const res = await API.get(`/api/incidents/${id}`)
+  return res.data
+}
+
 // ── Speech ──
 export const transcribeAudio = async (audioBlob, incidentId = null) => {
   const formData = new FormData()
@@ -60,13 +70,20 @@ export const transcribeAudio = async (audioBlob, incidentId = null) => {
 
 // ── Resources ──
 export const fetchResources = async (status = null) => {
-  const url = status ? `/api/resources?status=${status}` : '/api/resources'
+  const url = status
+    ? `/api/resources?status=${status}`
+    : '/api/resources'
   const res = await API.get(url)
   return res.data
 }
 
 export const fetchIncidentResources = async (incidentId) => {
   const res = await API.get(`/api/resources/incident/${incidentId}`)
+  return res.data
+}
+
+export const fetchAllIncidentResources = async (incidentId) => {
+  const res = await API.get(`/api/resources/incident/${incidentId}/all`)
   return res.data
 }
 
@@ -82,7 +99,6 @@ export const releaseAllResources = async (incidentId) => {
   const res = await API.post(`/api/resources/release-all/${incidentId}`)
   return res.data
 }
-// Add this to the bottom of your existing api/index.js
 
 // ── Twilio ──
 export const fetchCallLogs = async (incidentId) => {

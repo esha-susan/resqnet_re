@@ -1,0 +1,290 @@
+/* frontend/src/styles/incidentview.css */
+
+.iv-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  /* ── Back Button ── */
+  .iv-back {
+    background: transparent;
+    border: none;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0;
+    width: fit-content;
+    transition: color 0.2s;
+  }
+  
+  .iv-back:hover { color: var(--color-text); }
+  
+  /* ── Alerts ── */
+  .iv-alert {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .iv-alert.error {
+    background: rgba(231,76,60,0.15);
+    border: 1px solid var(--color-danger);
+    color: #ff6b6b;
+  }
+  
+  .iv-alert.success {
+    background: rgba(46,204,113,0.15);
+    border: 1px solid var(--color-success);
+    color: var(--color-success);
+  }
+  
+  /* ── Header ── */
+  .iv-header {
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 2rem;
+  }
+  
+  .iv-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .iv-title-row h2 { font-size: 1.4rem; }
+  
+  .iv-meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+  
+  .iv-status { font-weight: 600; }
+  .iv-status-open        { color: #3498db; }
+  .iv-status-in_progress { color: #f39c12; }
+  .iv-status-closed      { color: #2ecc71; }
+  
+  .iv-description {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  
+  /* ── Sections ── */
+  .iv-section {
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+  
+  .iv-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  
+  .iv-section-header h3 { font-size: 1.05rem; }
+  
+  .iv-count {
+    background: var(--color-card);
+    color: var(--color-muted);
+    padding: 0.25rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+  }
+  
+  .iv-empty {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  /* ── Resource Cards ── */
+  .iv-resource-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .iv-resource-card {
+    background: var(--color-card);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .iv-resource-icon { font-size: 1.5rem; }
+  
+  .iv-resource-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  
+  .iv-resource-type {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+  
+  .iv-resource-location {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+  
+  .iv-assigned-time {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+  
+  .iv-release-btn {
+    background: transparent;
+    border: 1px solid #e67e22;
+    color: #e67e22;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  
+  .iv-release-btn:hover {
+    background: #e67e22;
+    color: white;
+  }
+  
+  /* ── Call Logs ── */
+  .iv-call-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .iv-call-card {
+    background: var(--color-card);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .iv-call-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  
+  .iv-call-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  
+  .iv-call-phone {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+  
+  .iv-call-status {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.25rem 0.8rem;
+    border-radius: 12px;
+    text-transform: capitalize;
+  }
+  
+  .iv-call-confirmed  {
+    background: rgba(46,204,113,0.15);
+    color: #2ecc71;
+  }
+  .iv-call-initiated  {
+    background: rgba(52,152,219,0.15);
+    color: #3498db;
+  }
+  .iv-call-unavailable {
+    background: rgba(231,76,60,0.15);
+    color: #e74c3c;
+  }
+  .iv-call-no_answer  {
+    background: rgba(243,156,18,0.15);
+    color: #f39c12;
+  }
+  
+  .iv-call-time {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+  
+  /* ── Close Section ── */
+  .iv-close-section {
+    background: rgba(231,76,60,0.08);
+    border: 1px solid rgba(231,76,60,0.2);
+    border-radius: var(--radius);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  
+  .iv-close-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+    color: #ff6b6b;
+  }
+  
+  .iv-close-info p {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+  
+  .iv-close-btn {
+    background: var(--color-danger);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.8rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  
+  .iv-close-btn:hover    { opacity: 0.9; }
+  .iv-close-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  
+  /* ── Closed Banner ── */
+  .iv-closed-banner {
+    background: rgba(46,204,113,0.1);
+    border: 1px solid rgba(46,204,113,0.3);
+    color: #2ecc71;
+    border-radius: var(--radius);
+    padding: 1.2rem 1.5rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .iv-error {
+    color: var(--color-muted);
+    text-align: center;
+    padding: 4rem;
+  }

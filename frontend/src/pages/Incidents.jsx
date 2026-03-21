@@ -1,5 +1,6 @@
 // frontend/src/pages/Incidents.jsx
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import IncidentCard from '../components/IncidentCard'
 import SpeechRecorder from '../components/SpeechRecorder'
@@ -10,6 +11,7 @@ import '../styles/speech.css'
 const PRIORITIES = ['Low', 'Medium', 'High', 'Critical']
 
 function Incidents() {
+  const navigate = useNavigate() // ✅ Added useNavigate
   const [incidents, setIncidents] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -209,7 +211,13 @@ function Incidents() {
           ) : (
             <div className="incident-list">
               {incidents.map(incident => (
-                <IncidentCard key={incident.id} incident={incident} />
+                <div
+                  key={incident.id}
+                  onClick={() => navigate(`/incidents/${incident.id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <IncidentCard incident={incident} />
+                </div>
               ))}
             </div>
           )}
