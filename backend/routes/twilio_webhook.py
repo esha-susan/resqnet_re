@@ -1,4 +1,7 @@
 # backend/routes/twilio_webhook.py
+# Twilio webhook endpoints.
+# Handles keypress responses from responders during calls.
+
 from flask import Blueprint, request, Response, jsonify
 from services import supabase
 
@@ -9,34 +12,41 @@ twilio_bp = Blueprint('twilio', __name__, url_prefix='/api/twilio')
 def handle_response():
     """
     Called by Twilio when responder presses a key.
-    Digits: 1 = confirmed, 2 = unavailable
+    Updates call_logs with confirmed/unavailable/no_answer status.
+    Returns TwiML telling Twilio what to say next.
     """
-    digits = request.form.get('Digits', '')
+    digits   = request.form.get('Digits', '')
     call_sid = request.form.get('CallSid', '')
 
     if digits == '1':
-        status = 'confirmed'
+        status  = 'confirmed'
         message = 'Thank you for confirming. Please proceed to the incident location immediately. Stay safe.'
     elif digits == '2':
-        status = 'unavailable'
+        status  = 'unavailable'
         message = 'You have been marked as unavailable. Dispatch will assign another unit.'
     else:
-        status = 'no_answer'
+        status  = 'no_answer'
         message = 'Invalid response received. Please contact dispatch directly.'
 
-    # Update call log
+    # Update call log with response
     if call_sid:
-        supabase.table("call_logs").update({
-            "status": status
-        }).eq("call_sid", call_sid).execute()
+        try:
+            supabase.table("call_logs").update({
+                "status": status
+            }).eq("call_sid", call_sid).execute()
+        except Exception as e:
+            print(f"⚠️ Failed to update call log: {e}")
 
-    twiml_response = """<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Say voice="alice">{}</Say>
-    <Hangup/>
-</Response>""".format(message)
+    # Return clean single-line TwiML — no whitespace issues
+    twiml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<Response>'
+        f'<Say voice="alice">{message}</Say>'
+        '<Hangup/>'
+        '</Response>'
+    )
 
-    return Response(twiml_response, mimetype='text/xml')
+    return Response(twiml, mimetype='text/xml', status=200)
 
 
 @twilio_bp.route('/call-logs/<incident_id>', methods=['GET'])
@@ -53,4 +63,3 @@ def get_call_logs(incident_id):
         return jsonify(response.data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-

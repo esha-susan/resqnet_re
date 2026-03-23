@@ -1,4 +1,10 @@
+# backend/agents/report_agent.py
+# THE REPORT AGENT
+# Generates a structured incident report when an incident is closed.
+# Called from a background thread with a 15s delay so Twilio
+# has enough time to update call_logs with confirmed status.
 
+import time
 from services import supabase
 from datetime import datetime
 
@@ -43,15 +49,17 @@ def calculate_response_time(created_at: str, closed_at: str) -> str:
     Returns human readable string like "1 hour 23 minutes".
     """
     try:
-        # Parse timestamps
-        fmt = "%Y-%m-%dT%H:%M:%S"
-        start = datetime.fromisoformat(created_at.replace("Z", "").split(".")[0])
-        end = datetime.fromisoformat(closed_at.replace("Z", "").split(".")[0])
+        start = datetime.fromisoformat(
+            created_at.replace("Z", "").split(".")[0]
+        )
+        end = datetime.fromisoformat(
+            closed_at.replace("Z", "").split(".")[0]
+        )
 
         diff = end - start
         total_seconds = int(diff.total_seconds())
 
-        hours = total_seconds // 3600
+        hours   = total_seconds // 3600
         minutes = (total_seconds % 3600) // 60
         seconds = total_seconds % 60
 
@@ -70,32 +78,24 @@ def generate_summary(incident: dict, resources: list, calls: list) -> str:
     Auto-generates a plain English resolution summary
     based on the incident data.
     """
-    priority = incident.get("priority", "Unknown")
-    title = incident.get("title", "Unknown incident")
-    location = incident.get("location", "Unknown location")
+    priority  = incident.get("priority", "Unknown")
+    title     = incident.get("title", "Unknown incident")
+    location  = incident.get("location", "Unknown location")
 
     total_resources = len(resources)
-    resource_types = list(set([
+    resource_types  = list(set([
         r["resources"]["type"].replace("_", " ")
         for r in resources if r.get("resources")
     ]))
 
     confirmed_calls = len([c for c in calls if c.get("status") == "confirmed"])
-    total_calls = len(calls)
-
-    # Fix: correct grammar for singular/plural
-    if total_resources == 1:
-        resource_text = f"1 resource unit was deployed"
-    else:
-        resource_text = f"{total_resources} resource units were deployed"
-
-    resource_types_text = (
-        ', '.join(resource_types) if resource_types else 'various units'
-    )
+    total_calls     = len(calls)
 
     summary = (
         f"A {priority} priority incident '{title}' was reported at {location}. "
-        f"{resource_text} including {resource_types_text}. "
+        f"{total_resources} resource unit{'s' if total_resources != 1 else ''} "
+        f"were deployed including "
+        f"{', '.join(resource_types) if resource_types else 'various units'}. "
     )
 
     if total_calls > 0:
@@ -110,10 +110,13 @@ def generate_summary(incident: dict, resources: list, calls: list) -> str:
     )
 
     return summary
+
+
 def generate_report(incident_id: str) -> dict:
     """
     Main entry point for the Report Agent.
     Collects all data, builds report, saves to database.
+    Called after a 15 second delay so Twilio call status is updated.
 
     Returns the saved report dict.
     """
@@ -123,10 +126,10 @@ def generate_report(incident_id: str) -> dict:
         raise Exception(f"Incident {incident_id} not found")
 
     resources = get_all_assigned_resources(incident_id)
-    calls = get_call_logs(incident_id)
+    calls     = get_call_logs(incident_id)
 
     # Step 2: Calculate response time
-    closed_at = incident.get("updated_at") or datetime.utcnow().isoformat()
+    closed_at     = incident.get("updated_at") or datetime.utcnow().isoformat()
     response_time = calculate_response_time(
         incident.get("created_at", ""),
         closed_at
@@ -140,11 +143,11 @@ def generate_report(incident_id: str) -> dict:
 
     # Step 4: Build call summary
     call_summary = {
-        "total": len(calls),
-        "confirmed": len([c for c in calls if c.get("status") == "confirmed"]),
+        "total":       len(calls),
+        "confirmed":   len([c for c in calls if c.get("status") == "confirmed"]),
         "unavailable": len([c for c in calls if c.get("status") == "unavailable"]),
-        "no_answer": len([c for c in calls if c.get("status") == "no_answer"]),
-        "initiated": len([c for c in calls if c.get("status") == "initiated"]),
+        "no_answer":   len([c for c in calls if c.get("status") == "no_answer"]),
+        "initiated":   len([c for c in calls if c.get("status") == "initiated"]),
     }
 
     # Step 5: Generate resolution summary
@@ -153,27 +156,27 @@ def generate_report(incident_id: str) -> dict:
     # Step 6: Build complete report
     report_data = {
         "incident": {
-            "id": incident["id"],
-            "title": incident["title"],
+            "id":          incident["id"],
+            "title":       incident["title"],
             "description": incident["description"],
-            "location": incident["location"],
-            "priority": incident["priority"],
-            "status": incident["status"],
-            "created_at": incident["created_at"],
-            "closed_at": closed_at,
+            "location":    incident["location"],
+            "priority":    incident["priority"],
+            "status":      incident["status"],
+            "created_at":  incident["created_at"],
+            "closed_at":   closed_at,
         },
         "timeline": {
-            "reported": incident["created_at"],
-            "closed": closed_at,
+            "reported":            incident["created_at"],
+            "closed":              closed_at,
             "total_response_time": response_time,
         },
         "resources": {
             "total_deployed": len(resources),
-            "breakdown": resource_summary,
+            "breakdown":      resource_summary,
             "details": [
                 {
-                    "type": r["resources"]["type"] if r.get("resources") else "unknown",
-                    "location": r["resources"]["location"] if r.get("resources") else "unknown",
+                    "type":        r["resources"]["type"] if r.get("resources") else "unknown",
+                    "location":    r["resources"]["location"] if r.get("resources") else "unknown",
                     "assigned_at": r.get("assigned_at"),
                     "released_at": r.get("released_at"),
                 }
@@ -185,15 +188,15 @@ def generate_report(incident_id: str) -> dict:
             "logs": [
                 {
                     "responder": c.get("responder_name"),
-                    "phone": c.get("phone"),
-                    "status": c.get("status"),
-                    "time": c.get("created_at"),
+                    "phone":     c.get("phone"),
+                    "status":    c.get("status"),
+                    "time":      c.get("created_at"),
                 }
                 for c in calls
             ]
         },
         "resolution_summary": summary_text,
-        "generated_at": datetime.utcnow().isoformat(),
+        "generated_at":       datetime.utcnow().isoformat(),
     }
 
     # Step 7: Save report to database

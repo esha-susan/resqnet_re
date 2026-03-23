@@ -1,3 +1,5 @@
+# backend/routes/incidents.py
+import threading
 from flask import Blueprint, jsonify, request
 from middleware.auth_middleware import require_auth
 from services.incident_service import (
@@ -13,7 +15,7 @@ from services.resource_service import (
     release_all_incident_resources,
     get_unreleased_resources
 )
-from agents.report_agent import generate_report    # ← NEW
+from agents.report_agent import generate_report
 
 incidents_bp = Blueprint('incidents', __name__)
 
@@ -29,12 +31,14 @@ def create():
         return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
 
     try:
+        # Step 1: Auto-assign priority
         priority_result = analyze_incident(
             title=body['title'],
             description=body['description']
         )
         final_priority = priority_result['priority']
 
+        # Step 2: Create incident
         incident = create_incident(
             title=body['title'],
             description=body['description'],
@@ -43,6 +47,7 @@ def create():
             user_id=request.current_user.id
         )
 
+        # Step 3: Allocate resources + trigger Twilio calls
         resource_result = allocate_resources(
             incident_id=incident['id'],
             priority=final_priority,
@@ -120,9 +125,10 @@ def update_priority(incident_id):
 def close_incident(incident_id):
     """
     Closes incident:
-    1. Releases all resources
-    2. Sets status to closed
-    3. Triggers Report Agent automatically
+    1. Releases all resources immediately
+    2. Sets status to closed immediately
+    3. Generates report in background after 15s delay
+       (gives Twilio time to process keypress and update call_logs)
     """
     try:
         incident = get_incident_by_id(incident_id)
@@ -138,20 +144,29 @@ def close_incident(incident_id):
         # Step 2: Close the incident
         closed = update_incident_status(incident_id, 'closed')
 
-        # Step 3: Generate report automatically
-        report = None
-        try:
-            report = generate_report(incident_id)
-        except Exception as e:
-            # Don't crash if report fails — incident is still closed
-            print(f"⚠️ Report generation failed: {e}")
+        # Step 3: Generate report in background after delay
+        def delayed_report(inc_id):
+            import time
+            time.sleep(15)
+            try:
+                generate_report(inc_id)
+                print(f"✅ Report generated for incident {inc_id}")
+            except Exception as e:
+                print(f"⚠️ Report generation failed: {e}")
+
+        thread = threading.Thread(
+            target=delayed_report,
+            args=(incident_id,)
+        )
+        thread.daemon = True
+        thread.start()
 
         return jsonify({
             "incident": closed,
             "resources_released": released_count,
-            "report_generated": report is not None,
-            "report_id": report["id"] if report else None,
-            "message": f"Incident closed. {released_count} resources released."
+            "report_generated": True,
+            "report_id": None,
+            "message": f"Incident closed. {released_count} resources released. Report generating in background."
         }), 200
 
     except Exception as e:
