@@ -1,0 +1,418 @@
+/* frontend/src/styles/dashboard.css */
+
+.db-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  /* ── Loading ── */
+  .db-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 1rem;
+    color: var(--color-muted);
+  }
+  
+  .db-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* ── Header ── */
+  .db-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .db-header h2 { font-size: 1.6rem; }
+  
+  .db-subtitle {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+  }
+  
+  .db-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .db-last-updated {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+  
+  .db-refresh-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--color-muted);
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .db-refresh-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  .db-refresh-btn.spinning {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* ── Top Stats Row ── */
+  .db-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  
+  @media (max-width: 900px) {
+    .db-stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  
+  @media (max-width: 500px) {
+    .db-stats-row { grid-template-columns: 1fr; }
+  }
+  
+  .db-stat-card {
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  
+  .db-stat-card.clickable { cursor: pointer; }
+  
+  .db-stat-card.clickable:hover {
+    border-color: rgba(230,57,70,0.3);
+    transform: translateY(-2px);
+  }
+  
+  .db-stat-icon { font-size: 1.5rem; }
+  
+  .db-stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+  
+  .db-stat-label {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    font-weight: 500;
+  }
+  
+  .db-stat-sub {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.3rem;
+  }
+  
+  .db-stat-sub span {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .db-stat-sub .open        { color: #3498db; }
+  .db-stat-sub .inprogress  { color: #f39c12; }
+  .db-stat-sub .closed      { color: #2ecc71; }
+  .db-stat-sub .available   { color: #2ecc71; }
+  .db-stat-sub .busy        { color: #e74c3c; }
+  .db-stat-sub .confirmed   { color: #2ecc71; }
+  .db-stat-sub .missed      { color: #e74c3c; }
+  
+  /* ── Middle Row ── */
+  .db-middle-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  @media (max-width: 700px) {
+    .db-middle-row { grid-template-columns: 1fr; }
+  }
+  
+  /* ── Panel ── */
+  .db-panel {
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+  
+  .db-panel h3 {
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .db-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  
+  .db-panel-header h3 { margin-bottom: 0; }
+  
+  .db-see-all {
+    background: transparent;
+    border: none;
+    color: var(--color-primary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  .db-see-all:hover { opacity: 0.7; }
+  
+  /* ── Priority List ── */
+  .db-priority-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  
+  .db-priority-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .db-priority-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  
+  .db-priority-dot.critical { background: #e74c3c; }
+  .db-priority-dot.high     { background: #e67e22; }
+  .db-priority-dot.medium   { background: #f39c12; }
+  .db-priority-dot.low      { background: #2ecc71; }
+  
+  .db-priority-label {
+    font-size: 0.85rem;
+    width: 60px;
+    flex-shrink: 0;
+  }
+  
+  .db-priority-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .db-priority-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+    min-width: 4px;
+  }
+  
+  .db-priority-bar.critical { background: #e74c3c; }
+  .db-priority-bar.high     { background: #e67e22; }
+  .db-priority-bar.medium   { background: #f39c12; }
+  .db-priority-bar.low      { background: #2ecc71; }
+  
+  .db-priority-count {
+    font-size: 0.85rem;
+    font-weight: 700;
+    width: 20px;
+    text-align: right;
+  }
+  
+  /* ── Resource Type List ── */
+  .db-resource-type-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  
+  .db-resource-type-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--color-card);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+  }
+  
+  .db-resource-type-icon { font-size: 1.3rem; }
+  
+  .db-resource-type-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    flex: 1;
+  }
+  
+  .db-resource-type-counts {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  
+  .available-dot { color: #2ecc71; }
+  .busy-dot      { color: #e74c3c; }
+  
+  /* ── Bottom Row ── */
+  .db-bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  @media (max-width: 700px) {
+    .db-bottom-row { grid-template-columns: 1fr; }
+  }
+  
+  /* ── Incident List ── */
+  .db-incident-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .db-incident-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+    background: var(--color-card);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    border: 1px solid transparent;
+  }
+  
+  .db-incident-row:hover {
+    border-color: rgba(230,57,70,0.2);
+  }
+  
+  .db-incident-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .db-incident-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .db-incident-location,
+  .db-incident-time {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+  
+  .db-incident-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    flex-shrink: 0;
+  }
+  
+  .db-incident-status {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  
+  .db-incident-status.open        { color: #3498db; }
+  .db-incident-status.in_progress { color: #f39c12; }
+  .db-incident-status.closed      { color: #2ecc71; }
+  
+  /* ── Empty State ── */
+  .db-empty {
+    text-align: center;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    padding: 2rem;
+  }
+  
+  /* ── Quick Actions ── */
+  .db-quick-actions {
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+  
+  .db-quick-actions h3 {
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .db-actions-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .db-action-btn {
+    background: var(--color-card);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--color-text);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  
+  .db-action-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  .db-action-btn.primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+  }
+  
+  .db-action-btn.primary:hover {
+    opacity: 0.9;
+    color: white;
+  }

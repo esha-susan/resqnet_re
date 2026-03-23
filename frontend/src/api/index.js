@@ -118,3 +118,10 @@ export const fetchReportByIncident = async (incidentId) => {
   const res = await API.get(`/api/reports/${incidentId}`)
   return res.data
 }
+// Add to bottom of existing api/index.js
+
+// ── Dashboard ──
+export const fetchDashboardStats = async () => {
+  const res = await API.get('/api/dashboard/stats')
+  return res.data
+}
