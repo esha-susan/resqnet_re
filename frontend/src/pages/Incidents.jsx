@@ -71,7 +71,7 @@ function Incidents() {
       setDescription('')
       setLocation('')
 
-      setSuccess(`✅ Incident reported — Priority auto-assigned: ${newIncident.priority}`)
+      setSuccess(`Incident reported — Priority auto-assigned: ${newIncident.priority}`)
       setTimeout(() => setSuccess(''), 5000)
 
     } catch (err) {
@@ -92,7 +92,7 @@ function Incidents() {
       )
 
       setOverridePriority(newPriority)
-      setSuccess(`✅ Priority updated to: ${newPriority}`)
+      setSuccess(`Priority updated to: ${newPriority}`)
       setTimeout(() => setSuccess(''), 3000)
 
     } catch {
@@ -106,7 +106,7 @@ function Incidents() {
       <div className="incidents-container">
 
         <section className="incident-form-section">
-          <h2>🚨 Report New Incident</h2>
+          <h2 className="section-title">Report New Incident</h2>
           <p className="section-sub">
             Priority is automatically assigned by the AI — you can override it after submission
           </p>
@@ -117,7 +117,7 @@ function Incidents() {
           {showOverride && autoPriority && (
             <div className="priority-result-box">
               <div className="priority-result-header">
-                <span>🤖 AI assigned priority:</span>
+                <span>AI assigned priority:</span>
                 <span className={`priority-result-badge badge-${autoPriority.toLowerCase()}`}>
                   {overridePriority || autoPriority}
                 </span>
@@ -182,7 +182,7 @@ function Incidents() {
             </div>
 
             <div className="ai-notice">
-              🤖 Priority will be automatically determined from your description
+              Priority will be automatically determined from your description
             </div>
 
             <button
@@ -190,14 +190,14 @@ function Incidents() {
               className="submit-incident-btn"
               disabled={submitting}
             >
-              {submitting ? 'Analyzing & Reporting...' : '🚨 Report Incident'}
+              {submitting ? 'Analyzing & Reporting...' : 'Report Incident'}
             </button>
           </form>
         </section>
 
         <section className="incident-list-section">
           <div className="list-header">
-            <h2>📋 Active Incidents</h2>
+            <h2 className="section-title">Active Incidents</h2>
             <span className="incident-count">{incidents.length} total</span>
           </div>
 

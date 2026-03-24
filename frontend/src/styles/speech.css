@@ -1,12 +1,13 @@
 /* frontend/src/styles/speech.css */
 
 .speech-recorder {
-    background: var(--color-card);
-    border: 1px solid rgba(230, 57, 70, 0.2);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-  }
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 85, 255, 0.2);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
   
   .speech-header {
     display: flex;
@@ -23,20 +24,20 @@
   .speech-header h4 {
     font-size: 1rem;
     margin-bottom: 0.2rem;
-    color: var(--color-text);
+    color: #FFFFFF;
   }
   
   .speech-header p {
     font-size: 0.82rem;
-    color: var(--color-muted);
+    color: #94A3B8;
   }
   
   /* ── Buttons ── */
   .record-btn {
-    background: var(--color-primary);
+    background: #0055FF;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 0.7rem 1.5rem;
     font-size: 0.95rem;
     font-weight: 600;
@@ -48,10 +49,12 @@
   .record-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   
   .stop-btn {
-    background: #e74c3c;
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #ef4444;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 0.7rem 1.5rem;
     font-size: 0.95rem;
     font-weight: 600;
@@ -64,8 +67,8 @@
   .record-again-btn {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.15);
-    color: var(--color-muted);
-    border-radius: 8px;
+    color: #94A3B8;
+    border-radius: 12px;
     padding: 0.5rem 1.2rem;
     font-size: 0.85rem;
     cursor: pointer;
@@ -74,8 +77,8 @@
   }
   
   .record-again-btn:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+    border-color: #0055FF;
+    color: #0055FF;
   }
   
   /* ── Status displays ── */
@@ -83,7 +86,7 @@
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    color: var(--color-muted);
+    color: #94A3B8;
     font-size: 0.9rem;
   }
   
@@ -107,12 +110,14 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--color-muted);
+    background: #94A3B8;
     display: inline-block;
     animation: pulse 1.2s infinite;
   }
   
-  .pulse-dot.red { background: #e74c3c; }
+  .pulse-dot.red { background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #ef4444; }
   
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
@@ -124,7 +129,7 @@
     width: 16px;
     height: 16px;
     border: 2px solid rgba(255,255,255,0.2);
-    border-top-color: var(--color-primary);
+    border-top-color: #0055FF;
     border-radius: 50%;
     display: inline-block;
     animation: spin 0.8s linear infinite;
@@ -157,13 +162,13 @@
     margin-top: 1rem;
     padding: 1rem;
     background: rgba(255,255,255,0.03);
-    border-radius: 8px;
-    border-left: 3px solid var(--color-primary);
+    border-radius: 12px;
+    border-left: 3px solid #0055FF;
   }
   
   .transcript-label {
     font-size: 0.75rem;
-    color: var(--color-muted);
+    color: #94A3B8;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     display: block;
@@ -172,7 +177,7 @@
   
   .transcript-preview p {
     font-size: 0.9rem;
-    color: var(--color-text);
+    color: #FFFFFF;
     line-height: 1.6;
     font-style: italic;
   }

@@ -10,10 +10,10 @@ import { fetchResources } from '../api/index'
 import '../styles/resources.css'
 
 const RESOURCE_ICONS = {
-  ambulance:  '🚑',
-  fire_truck: '🚒',
-  doctor:     '👨‍⚕️',
-  police:     '🚔',
+  ambulance: 'AMB',
+  fire_truck: 'FIRE',
+  doctor: 'MED',
+  police: 'POL',
 }
 
 function Resources() {
@@ -50,7 +50,7 @@ function Resources() {
       <div className="resources-container">
 
         <div className="resources-header">
-          <h2>🚑 Resource Management</h2>
+          <h2>Resource Management</h2>
           <p className="section-sub">Live status of all emergency resources</p>
         </div>
 
@@ -82,7 +82,7 @@ function Resources() {
             </button>
           ))}
           <button className="refresh-btn" onClick={loadResources}>
-            🔄 Refresh
+            Refresh
           </button>
         </div>
 
@@ -97,11 +97,11 @@ function Resources() {
                 className={`resource-card ${resource.status}`}
               >
                 <div className="resource-icon">
-                  {RESOURCE_ICONS[resource.type] || '🔧'}
+                  {RESOURCE_ICONS[resource.type] || 'RES'}
                 </div>
                 <div className="resource-info">
                   <h4>{resource.type.replace('_', ' ').toUpperCase()}</h4>
-                  <p className="resource-location">📍 {resource.location}</p>
+                  <p className="resource-location">{resource.location}</p>
                 </div>
                 <div className={`resource-status-dot ${resource.status}`} />
                 <span className={`resource-status-text ${resource.status}`}>

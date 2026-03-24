@@ -16,10 +16,10 @@ import {
 import '../styles/incidentview.css'
 
 const RESOURCE_ICONS = {
-  ambulance:  '🚑',
-  fire_truck: '🚒',
-  doctor:     '👨‍⚕️',
-  police:     '🚔',
+  ambulance: "AMB",
+  fire_truck: "FIRE",
+  doctor: "MED",
+  police: "POL",
 }
 
 function IncidentView() {
@@ -59,7 +59,7 @@ function IncidentView() {
   const handleReleaseResource = async (resourceId) => {
     try {
       await releaseResource(resourceId, id)
-      setSuccess('✅ Resource released successfully')
+      setSuccess('Resource released successfully')
       setTimeout(() => setSuccess(''), 3000)
       const updated = await fetchIncidentResources(id)
       setResources(updated)
@@ -139,11 +139,11 @@ function IncidentView() {
             <PriorityBadge priority={incident.priority} />
           </div>
           <div className="iv-meta">
-            <span>📍 {incident.location}</span>
+            <span>{incident.location}</span>
             <span className={`iv-status iv-status-${incident.status}`}>
-              ● {incident.status.replace('_', ' ')}
+              {incident.status.replace('_', ' ')}
             </span>
-            <span>🕐 {formatDate(incident.created_at)}</span>
+            <span>{formatDate(incident.created_at)}</span>
           </div>
           <p className="iv-description">{incident.description}</p>
         </div>
@@ -151,7 +151,7 @@ function IncidentView() {
         {/* ── Resources Section ── */}
         <div className="iv-section">
           <div className="iv-section-header">
-            <h3>🚑 Assigned Resources</h3>
+            <h3>Assigned Resources</h3>
             <span className="iv-count">{resources.length} active</span>
           </div>
 
@@ -164,14 +164,14 @@ function IncidentView() {
               {resources.map(item => (
                 <div key={item.id} className="iv-resource-card">
                   <span className="iv-resource-icon">
-                    {RESOURCE_ICONS[item.resources?.type] || '🔧'}
+                    {RESOURCE_ICONS[item.resources?.type] || 'RES'}
                   </span>
                   <div className="iv-resource-info">
                     <span className="iv-resource-type">
                       {item.resources?.type?.replace('_', ' ').toUpperCase()}
                     </span>
                     <span className="iv-resource-location">
-                      📍 {item.resources?.location}
+                      {item.resources?.location}
                     </span>
                   </div>
                   <span className="iv-assigned-time">
@@ -194,7 +194,7 @@ function IncidentView() {
         {/* ── Call Logs Section ── */}
         <div className="iv-section">
           <div className="iv-section-header">
-            <h3>📞 Call Logs</h3>
+            <h3>Call Logs</h3>
             <span className="iv-count">{callLogs.length} calls</span>
           </div>
 
@@ -235,7 +235,7 @@ function IncidentView() {
               onClick={handleCloseIncident}
               disabled={closing}
             >
-              {closing ? 'Closing...' : '✅ Close Incident'}
+              {closing ? 'Closing...' : 'Close Incident'}
             </button>
           </div>
         )}
@@ -244,13 +244,13 @@ function IncidentView() {
         {incident.status === 'closed' && (
           <div className="iv-closed-section">
             <div className="iv-closed-banner">
-              ✅ This incident has been closed and all resources released.
+              This incident has been closed and all resources released.
             </div>
             <button
               className="iv-view-report-btn"
               onClick={() => navigate('/reports')}
             >
-              📊 View Report
+              View Report
             </button>
           </div>
         )}

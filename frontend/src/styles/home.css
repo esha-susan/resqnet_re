@@ -1,0 +1,277 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Reset */
+#root:has(.dribbble-layout) {
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+body:has(.dribbble-layout) {
+  margin: 0;
+  padding: 0;
+  background-color: #0A0C10;
+  /* Deep Obsidian */
+  color: #FFFFFF;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Base Wrapper */
+.dribbble-layout {
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  background-color: #0A0C10;
+  z-index: 1;
+}
+
+/* Background Gradients & Textures */
+.glow-background {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 80vh;
+  background: radial-gradient(ellipse at center, rgba(0, 85, 255, 0.25) 0%, rgba(10, 12, 16, 0) 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.mesh-texture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.5;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Header/Nav */
+.home-header {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  z-index: 10;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.logo-icon {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #0055FF 0%, #00C6FF 100%);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #FFFFFF;
+}
+
+/* Hero Section */
+.hero-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 6rem 1.5rem 2rem;
+  max-width: 900px;
+  z-index: 10;
+}
+
+/* Pill Badge */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #E2E8F0;
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #0055FF;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #0055FF;
+}
+
+/* Huge Title */
+.hero-title {
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.5rem;
+  color: #FFFFFF;
+}
+
+.hero-title .highlight {
+  position: relative;
+  display: inline-block;
+  color: #0055FF;
+}
+
+/* Accented font style occasionally seen in these designs */
+.hero-title .accent-font {
+  font-family: serif;
+  font-style: italic;
+  font-weight: 400;
+  color: #E2E8F0;
+  padding: 0 0.2em;
+}
+
+/* Subtitle */
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #94A3B8;
+  max-width: 650px;
+  line-height: 1.6;
+  margin: 0 0 3rem;
+  font-weight: 400;
+}
+
+/* Actions (Buttons) */
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-pill.primary {
+  background: #0055FF;
+  color: #FFFFFF;
+  box-shadow: 0 4px 24px rgba(0, 85, 255, 0.4);
+}
+
+.btn-pill.primary:hover {
+  background: #0066FF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 85, 255, 0.6);
+  color: white;
+}
+
+.btn-pill.secondary {
+  background: transparent;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.btn-pill.secondary:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+  color: white;
+}
+
+/* Minimalist CheckHealth Indicator */
+.system-status-indicator {
+  margin-top: 4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(10, 12, 16, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  backdrop-filter: blur(12px);
+  color: #94A3B8;
+}
+
+.status-value {
+  color: #10b981;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-value.error {
+  color: #ef4444;
+}
+
+.status-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 12px #10b981;
+}
+
+.status-pulse.error {
+  background-color: #ef4444;
+  box-shadow: 0 0 12px #ef4444;
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+}

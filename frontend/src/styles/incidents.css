@@ -2,13 +2,49 @@
 
 /* ── Page Layout ── */
 .incidents-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-  }
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  background-color: #0A0C10;
+  color: #FFFFFF;
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  position: relative;
+}
+
+.incidents-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 80vh;
+  background: radial-gradient(ellipse at center, rgba(0, 85, 255, 0.15) 0%, rgba(10, 12, 16, 0) 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.incidents-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.incident-form-section, .incident-list-section {
+  position: relative;
+  z-index: 10;
+}
   
   /* ── Section Titles ── */
   .incident-form-section h2,
@@ -18,16 +54,18 @@
   }
   
   .section-sub {
-    color: var(--color-muted);
+    color: #94A3B8;
     font-size: 0.9rem;
     margin-bottom: 1.5rem;
   }
   
   /* ── Form ── */
   .incident-form {
-    background: var(--color-surface);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: var(--radius);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
     padding: 2rem;
     display: flex;
     flex-direction: column;
@@ -52,17 +90,17 @@
   
   .form-group label {
     font-size: 0.85rem;
-    color: var(--color-muted);
+    color: #94A3B8;
     font-weight: 500;
   }
   
   .form-group input,
   .form-group textarea {
-    background: var(--color-card);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     padding: 0.75rem 1rem;
-    color: var(--color-text);
+    color: #FFFFFF;
     font-size: 0.95rem;
     outline: none;
     resize: vertical;
@@ -72,7 +110,7 @@
   
   .form-group input:focus,
   .form-group textarea:focus {
-    border-color: var(--color-primary);
+    border-color: #0055FF;
   }
   
   /* ── Priority Selector ── */
@@ -91,8 +129,8 @@
     cursor: pointer;
     opacity: 0.5;
     transition: all 0.2s;
-    background: var(--color-card);
-    color: var(--color-text);
+    background: rgba(30, 41, 59, 0.4);
+    color: #FFFFFF;
   }
   
   .priority-btn.selected { opacity: 1; }
@@ -105,10 +143,10 @@
   
   /* ── Submit Button ── */
   .submit-incident-btn {
-    background: var(--color-primary);
+    background: #0055FF;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 0.9rem;
     font-size: 1rem;
     font-weight: 600;
@@ -124,7 +162,7 @@
     background: rgba(231, 76, 60, 0.15);
     border: 1px solid var(--color-danger);
     color: #ff6b6b;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
@@ -133,7 +171,7 @@
     background: rgba(46, 204, 113, 0.15);
     border: 1px solid var(--color-success);
     color: var(--color-success);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
@@ -147,8 +185,8 @@
   }
   
   .incident-count {
-    background: var(--color-card);
-    color: var(--color-muted);
+    background: rgba(30, 41, 59, 0.4);
+    color: #94A3B8;
     padding: 0.3rem 0.9rem;
     border-radius: 20px;
     font-size: 0.8rem;
@@ -162,16 +200,38 @@
   
   /* ── Incident Card ── */
   .incident-card {
-    background: var(--color-surface);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    transition: border-color 0.2s;
-  }
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
   
   .incident-card:hover {
-    border-color: rgba(230, 57, 70, 0.3);
-  }
+  border-color: rgba(0, 85, 255, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 85, 255, 0.1);
+}
+
+.incident-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 85, 255, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.incident-card:hover::before {
+  opacity: 1;
+}
   
   .incident-card-header {
     display: flex;
@@ -186,7 +246,7 @@
   }
   
   .incident-description {
-    color: var(--color-muted);
+    color: #94A3B8;
     font-size: 0.9rem;
     line-height: 1.6;
     margin-bottom: 1rem;
@@ -201,7 +261,7 @@
   
   .incident-location {
     font-size: 0.85rem;
-    color: var(--color-muted);
+    color: #94A3B8;
   }
   
   .incident-status {
@@ -221,7 +281,7 @@
   
   .incident-time {
     font-size: 0.8rem;
-    color: var(--color-muted);
+    color: #94A3B8;
   }
   
   /* ── Priority Badge ── */
@@ -244,7 +304,7 @@
   .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    color: var(--color-muted);
+    color: #94A3B8;
   }
   
   .empty-state p:first-child {
@@ -257,7 +317,7 @@
     background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.25);
     color: #a5b4fc;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 0.75rem 1rem;
     font-size: 0.85rem;
     text-align: center;
@@ -265,9 +325,10 @@
   
   /* Auto-assigned priority result box */
   .priority-result-box {
-    background: var(--color-card);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: var(--radius);
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
     padding: 1.2rem 1.5rem;
     margin-bottom: 1rem;
     display: flex;
@@ -280,7 +341,7 @@
     align-items: center;
     gap: 1rem;
     font-size: 0.95rem;
-    color: var(--color-muted);
+    color: #94A3B8;
   }
   
   .priority-result-badge {
@@ -307,7 +368,7 @@
   
   .override-label {
     font-size: 0.82rem;
-    color: var(--color-muted);
+    color: #94A3B8;
     white-space: nowrap;
   }
   
@@ -322,7 +383,7 @@
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.1);
     background: transparent;
-    color: var(--color-muted);
+    color: #94A3B8;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;

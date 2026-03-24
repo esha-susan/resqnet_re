@@ -134,7 +134,7 @@ function SpeechRecorder({ onTranscript, disabled }) {
   return (
     <div className="speech-recorder">
       <div className="speech-header">
-        <span className="speech-icon">🎙️</span>
+        
         <div>
           <h4>Voice Report</h4>
           <p>Record your incident description — it will be auto-transcribed</p>
@@ -150,7 +150,7 @@ function SpeechRecorder({ onTranscript, disabled }) {
             onClick={startRecording}
             disabled={disabled}
           >
-            🔴 Start Recording
+            Start Recording
           </button>
         )}
 
@@ -172,7 +172,7 @@ function SpeechRecorder({ onTranscript, disabled }) {
               className="stop-btn"
               onClick={stopRecording}
             >
-              ⏹ Stop Recording
+              Stop Recording
             </button>
           </div>
         )}
@@ -187,14 +187,14 @@ function SpeechRecorder({ onTranscript, disabled }) {
         {status === 'done' && (
           <div className="speech-done">
             <div className="speech-success">
-              ✅ Transcription complete — description has been filled below
+              Transcription complete — description has been filled below
             </div>
             <button
               type="button"
               className="record-again-btn"
               onClick={reset}
             >
-              🔄 Record Again
+              Record Again
             </button>
           </div>
         )}
@@ -207,7 +207,7 @@ function SpeechRecorder({ onTranscript, disabled }) {
               className="record-again-btn"
               onClick={reset}
             >
-              🔄 Try Again
+              Try Again
             </button>
           </div>
         )}

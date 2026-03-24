@@ -43,7 +43,7 @@ function Reports() {
       <div className="reports-container">
 
         <div className="reports-header">
-          <h2>📊 Incident Reports</h2>
+          <h2>Incident Reports</h2>
           <p className="section-sub">
             Auto-generated reports for all closed incidents
           </p>
@@ -92,13 +92,13 @@ function Reports() {
                     <h3>{rd.incident?.title}</h3>
                     <PriorityBadge priority={rd.incident?.priority} />
                   </div>
-                  <p className="rd-location">📍 {rd.incident?.location}</p>
+                  <p className="rd-location">{rd.incident?.location}</p>
                   <p className="rd-description">{rd.incident?.description}</p>
                 </div>
 
                 {/* ── Timeline ── */}
                 <div className="rd-section">
-                  <h4>🕐 Timeline</h4>
+                  <h4>Timeline</h4>
                   <div className="rd-timeline">
                     <div className="rd-timeline-item">
                       <span className="rd-tl-label">Reported</span>
@@ -115,7 +115,7 @@ function Reports() {
                     <div className="rd-timeline-item highlight">
                       <span className="rd-tl-label">Total Response Time</span>
                       <span className="rd-tl-value">
-                        ⏱ {rd.timeline?.total_response_time}
+                        {rd.timeline?.total_response_time}
                       </span>
                     </div>
                   </div>
@@ -123,7 +123,7 @@ function Reports() {
 
                 {/* ── Resources ── */}
                 <div className="rd-section">
-                  <h4>🚑 Resources Deployed</h4>
+                  <h4>Resources Deployed</h4>
                   <div className="rd-resource-summary">
                     <div className="rd-resource-total">
                       <span className="rd-big-number">
@@ -146,7 +146,7 @@ function Reports() {
 
                 {/* ── Call Summary ── */}
                 <div className="rd-section">
-                  <h4>📞 Responder Calls</h4>
+                  <h4>Responder Calls</h4>
                   <div className="rd-call-summary">
                     {[
                       {
@@ -182,7 +182,7 @@ function Reports() {
 
                 {/* ── Resolution Summary ── */}
                 <div className="rd-section">
-                  <h4>📝 Resolution Summary</h4>
+                  <h4>Resolution Summary</h4>
                   <p className="rd-summary-text">
                     {rd.resolution_summary}
                   </p>

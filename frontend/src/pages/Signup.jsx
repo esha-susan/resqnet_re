@@ -48,8 +48,7 @@ function Signup() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <span className="auth-logo">🚨</span>
-          <h1>ResQNet</h1>
+          <h1>ResQNet<span className="auth-dot"></span></h1>
           <p>Create your account</p>
         </div>
 
