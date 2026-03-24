@@ -7,7 +7,19 @@ twilio_bp = Blueprint('twilio', __name__, url_prefix='/api/twilio')
 # ✅ STEP 1: Initial call (no double speaking)
 @twilio_bp.route('/response', methods=['POST'])
 def initial_call():
-    print("🔥 Initial Twilio webhook hit")
+    call_sid = request.form.get('CallSid', '')
+
+    print(f"🔥 Initial Twilio webhook hit: {call_sid}")
+
+    # ✅ Prevent duplicate execution
+    if hasattr(initial_call, "last_sid") and initial_call.last_sid == call_sid:
+        print("⚠️ Duplicate call detected, ignoring")
+        return Response(
+            '<?xml version="1.0"?><Response></Response>',
+            mimetype='text/xml'
+        )
+
+    initial_call.last_sid = call_sid
 
     twiml = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -16,17 +28,15 @@ def initial_call():
         action="/api/twilio/handle-input" 
         method="POST"
         timeout="5"
-        actionOnEmptyResult="true"
     >
         <Say voice="alice">
             This is an emergency alert. Press 1 to confirm availability. Press 2 if unavailable.
         </Say>
     </Gather>
+    <Hangup/>
 </Response>"""
 
-    return Response(twiml, mimetype='text/xml', status=200)
-
-
+    return Response(twiml, mimetype='text/xml')
 # ✅ STEP 2: Handle keypad input (including no input)
 @twilio_bp.route('/handle-input', methods=['POST'])
 def handle_response():
