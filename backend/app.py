@@ -7,7 +7,7 @@ from routes.speech import speech_bp
 from routes.resources import resources_bp
 from routes.twilio_webhook import twilio_bp
 from routes.reports import reports_bp
-from routes.dashboard import dashboard_bp       # ← NEW
+from routes.dashboard import dashboard_bp
 from config import FLASK_PORT
 
 def create_app():
@@ -28,11 +28,17 @@ def create_app():
     app.register_blueprint(resources_bp)
     app.register_blueprint(twilio_bp)
     app.register_blueprint(reports_bp)
-    app.register_blueprint(dashboard_bp)        # ← NEW
+    app.register_blueprint(dashboard_bp)
+
+    # ✅ Debug: print all routes
+    print("\n🚀 REGISTERED ROUTES:")
+    for rule in app.url_map.iter_rules():
+        print(rule)
 
     return app
 
+
 if __name__ == '__main__':
     app = create_app()
-    print(f"🚨 ResQNet Backend running on port {FLASK_PORT}")
+    print(f"🚨 Backend running on port {FLASK_PORT}")
     app.run(debug=True, port=FLASK_PORT)

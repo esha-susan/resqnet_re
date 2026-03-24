@@ -1,20 +1,37 @@
-# backend/routes/twilio_webhook.py
-# Twilio webhook endpoints.
-# Handles keypress responses from responders during calls.
-
 from flask import Blueprint, request, Response, jsonify
 from services import supabase
 
 twilio_bp = Blueprint('twilio', __name__, url_prefix='/api/twilio')
 
 
+# ✅ STEP 1: Initial call (no double speaking)
 @twilio_bp.route('/response', methods=['POST'])
+def initial_call():
+    print("🔥 Initial Twilio webhook hit")
+
+    twiml = """<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Gather 
+        numDigits="1" 
+        action="/api/twilio/handle-input" 
+        method="POST"
+        timeout="5"
+        actionOnEmptyResult="true"
+    >
+        <Say voice="alice">
+            This is an emergency alert. Press 1 to confirm availability. Press 2 if unavailable.
+        </Say>
+    </Gather>
+</Response>"""
+
+    return Response(twiml, mimetype='text/xml', status=200)
+
+
+# ✅ STEP 2: Handle keypad input (including no input)
+@twilio_bp.route('/handle-input', methods=['POST'])
 def handle_response():
-    """
-    Called by Twilio when responder presses a key.
-    Updates call_logs with confirmed/unavailable/no_answer status.
-    Returns TwiML telling Twilio what to say next.
-    """
+    print("🔥 Twilio input received")
+
     digits   = request.form.get('Digits', '')
     call_sid = request.form.get('CallSid', '')
 
@@ -26,32 +43,29 @@ def handle_response():
         message = 'You have been marked as unavailable. Dispatch will assign another unit.'
     else:
         status  = 'no_answer'
-        message = 'Invalid response received. Please contact dispatch directly.'
+        message = 'No input received. Goodbye.'
 
-    # Update call log with response
+    # ✅ Update DB safely
     if call_sid:
         try:
             supabase.table("call_logs").update({
                 "status": status
             }).eq("call_sid", call_sid).execute()
         except Exception as e:
-            print(f"⚠️ Failed to update call log: {e}")
+            print(f"⚠️ DB error: {e}")
 
-    # Return clean single-line TwiML — no whitespace issues
-    twiml = (
-        '<?xml version="1.0" encoding="UTF-8"?>'
-        '<Response>'
-        f'<Say voice="alice">{message}</Say>'
-        '<Hangup/>'
-        '</Response>'
-    )
+    twiml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say voice="alice">{message}</Say>
+    <Hangup/>
+</Response>"""
 
     return Response(twiml, mimetype='text/xml', status=200)
 
 
+# ✅ Existing API (unchanged)
 @twilio_bp.route('/call-logs/<incident_id>', methods=['GET'])
 def get_call_logs(incident_id):
-    """Returns all call logs for a specific incident."""
     try:
         response = (
             supabase.table("call_logs")
