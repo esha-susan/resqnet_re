@@ -1,11 +1,14 @@
 // frontend/src/pages/IncidentView.jsx
-// Detailed view of a single incident.
-// Shows assigned resources, call logs, and close/release controls.
+// Role-aware incident detail view.
+// Admins: full controls (add resources, release, close)
+// Responders: read-only view of their assigned incidents
 
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import PriorityBadge from '../components/PriorityBadge'
+import AddResourcesModal from '../components/AddResourcesModal'
+import { useAuth } from '../context/AuthContext'
 import {
   fetchIncidentById,
   fetchIncidentResources,
@@ -16,27 +19,27 @@ import {
 import '../styles/incidentview.css'
 
 const RESOURCE_ICONS = {
-  ambulance: "AMB",
-  fire_truck: "FIRE",
-  doctor: "MED",
-  police: "POL",
+  ambulance:  'AMB',
+  fire_truck: 'FIRE',
+  doctor:     'MED',
+  police:     'POL',
 }
 
 function IncidentView() {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { id }       = useParams()
+  const navigate     = useNavigate()
+  const { isAdmin }  = useAuth()          // ← role gate
 
-  const [incident, setIncident] = useState(null)
-  const [resources, setResources] = useState([])
-  const [callLogs, setCallLogs] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [closing, setClosing] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [incident,     setIncident]     = useState(null)
+  const [resources,    setResources]    = useState([])
+  const [callLogs,     setCallLogs]     = useState([])
+  const [loading,      setLoading]      = useState(true)
+  const [closing,      setClosing]      = useState(false)
+  const [error,        setError]        = useState('')
+  const [success,      setSuccess]      = useState('')
+  const [showAddModal, setShowAddModal] = useState(false)
 
-  useEffect(() => {
-    loadAll()
-  }, [id])
+  useEffect(() => { loadAll() }, [id])
 
   const loadAll = async () => {
     try {
@@ -61,8 +64,7 @@ function IncidentView() {
       await releaseResource(resourceId, id)
       setSuccess('Resource released successfully')
       setTimeout(() => setSuccess(''), 3000)
-      const updated = await fetchIncidentResources(id)
-      setResources(updated)
+      setResources(await fetchIncidentResources(id))
     } catch {
       setError('Failed to release resource')
     }
@@ -75,14 +77,11 @@ function IncidentView() {
 
     setClosing(true)
     setError('')
-
     try {
       const result = await closeIncident(id)
       setIncident(result.incident)
       setResources([])
-      setSuccess(
-        `✅ Incident closed. ${result.resources_released} resources released.`
-      )
+      setSuccess(`✅ Incident closed. ${result.resources_released} resources released.`)
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to close incident')
     } finally {
@@ -90,16 +89,25 @@ function IncidentView() {
     }
   }
 
-  const formatDate = (iso) => {
-    if (!iso) return 'Unknown'
-    return new Date(iso).toLocaleString()
+  const handleResourcesAdded = async (result) => {
+    try {
+      const [res, calls] = await Promise.all([
+        fetchIncidentResources(id),
+        fetchCallLogs(id)
+      ])
+      setResources(res)
+      setCallLogs(calls)
+    } catch { /* modal shows success already */ }
+
+    setSuccess(`🚨 ${result.total_assigned} extra resource(s) dispatched successfully.`)
+    setTimeout(() => setSuccess(''), 5000)
   }
 
-  // ── Loading state ──
+  const formatDate = (iso) => iso ? new Date(iso).toLocaleString() : 'Unknown'
+
   if (loading) {
     return (
-      <div>
-        <Navbar />
+      <div><Navbar />
         <div className="iv-container">
           <div className="loading-state">Loading incident...</div>
         </div>
@@ -107,11 +115,9 @@ function IncidentView() {
     )
   }
 
-  // ── Not found state ──
   if (!incident) {
     return (
-      <div>
-        <Navbar />
+      <div><Navbar />
         <div className="iv-container">
           <div className="iv-error">Incident not found.</div>
         </div>
@@ -124,15 +130,15 @@ function IncidentView() {
       <Navbar />
       <div className="iv-container">
 
-        {/* ── Back Button ── */}
+        {/* ── Back ── */}
         <button className="iv-back" onClick={() => navigate('/incidents')}>
           ← Back to Incidents
         </button>
 
-        {error && <div className="iv-alert error">{error}</div>}
+        {error   && <div className="iv-alert error">{error}</div>}
         {success && <div className="iv-alert success">{success}</div>}
 
-        {/* ── Incident Header ── */}
+        {/* ── Header ── */}
         <div className="iv-header">
           <div className="iv-title-row">
             <h2>{incident.title}</h2>
@@ -148,17 +154,26 @@ function IncidentView() {
           <p className="iv-description">{incident.description}</p>
         </div>
 
-        {/* ── Resources Section ── */}
+        {/* ── Resources ── */}
         <div className="iv-section">
           <div className="iv-section-header">
             <h3>Assigned Resources</h3>
-            <span className="iv-count">{resources.length} active</span>
+            <div className="iv-section-header-actions">
+              <span className="iv-count">{resources.length} active</span>
+              {/* Admin only: Add Resources */}
+              {isAdmin && incident.status !== 'closed' && (
+                <button
+                  className="iv-add-resources-btn"
+                  onClick={() => setShowAddModal(true)}
+                >
+                  + Add Resources
+                </button>
+              )}
+            </div>
           </div>
 
           {resources.length === 0 ? (
-            <div className="iv-empty">
-              No active resources — all have been released.
-            </div>
+            <div className="iv-empty">No active resources — all have been released.</div>
           ) : (
             <div className="iv-resource-list">
               {resources.map(item => (
@@ -177,7 +192,8 @@ function IncidentView() {
                   <span className="iv-assigned-time">
                     Assigned: {formatDate(item.assigned_at)}
                   </span>
-                  {incident.status !== 'closed' && (
+                  {/* Admin only: Release button */}
+                  {isAdmin && incident.status !== 'closed' && (
                     <button
                       className="iv-release-btn"
                       onClick={() => handleReleaseResource(item.resources?.id)}
@@ -191,7 +207,7 @@ function IncidentView() {
           )}
         </div>
 
-        {/* ── Call Logs Section ── */}
+        {/* ── Call Logs ── */}
         <div className="iv-section">
           <div className="iv-section-header">
             <h3>Call Logs</h3>
@@ -211,17 +227,15 @@ function IncidentView() {
                   <span className={`iv-call-status iv-call-${log.status}`}>
                     {log.status}
                   </span>
-                  <span className="iv-call-time">
-                    {formatDate(log.created_at)}
-                  </span>
+                  <span className="iv-call-time">{formatDate(log.created_at)}</span>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* ── Close Incident Button ── */}
-        {incident.status !== 'closed' && (
+        {/* ── Close Incident — Admin only ── */}
+        {isAdmin && incident.status !== 'closed' && (
           <div className="iv-close-section">
             <div className="iv-close-info">
               <h4>Close This Incident</h4>
@@ -240,22 +254,42 @@ function IncidentView() {
           </div>
         )}
 
-        {/* ── Closed Banner + View Report ── */}
+        {/* ── Responder read-only notice ── */}
+        {!isAdmin && incident.status !== 'closed' && (
+          <div className="iv-responder-notice">
+            <span>👁 You are viewing this incident as a responder. Contact your admin to make changes.</span>
+          </div>
+        )}
+
+        {/* ── Closed Banner ── */}
         {incident.status === 'closed' && (
           <div className="iv-closed-section">
             <div className="iv-closed-banner">
               This incident has been closed and all resources released.
             </div>
-            <button
-              className="iv-view-report-btn"
-              onClick={() => navigate('/reports')}
-            >
-              View Report
-            </button>
+            {isAdmin && (
+              <button
+                className="iv-view-report-btn"
+                onClick={() => navigate('/reports')}
+              >
+                View Report
+              </button>
+            )}
           </div>
         )}
 
       </div>
+
+      {showAddModal && (
+        <AddResourcesModal
+          incidentId={id}
+          onClose={() => setShowAddModal(false)}
+          onSuccess={(result) => {
+            handleResourcesAdded(result)
+            setShowAddModal(false)
+          }}
+        />
+      )}
     </div>
   )
 }

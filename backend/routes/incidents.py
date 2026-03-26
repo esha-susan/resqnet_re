@@ -10,7 +10,7 @@ from services.incident_service import (
     update_incident_priority
 )
 from agents.priority_agent import analyze_incident
-from agents.resource_agent import allocate_resources
+from agents.resource_agent import allocate_resources, get_available_resources, assign_resource
 from services.resource_service import (
     release_all_incident_resources,
     get_unreleased_resources
@@ -169,5 +169,108 @@ def close_incident(incident_id):
             "message": f"Incident closed. {released_count} resources released. Report generating in background."
         }), 200
 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ── THIS IS NOW CORRECTLY OUTSIDE close_incident ──────────────────────────────
+@incidents_bp.route('/api/incidents/<incident_id>/add-resources', methods=['POST'])
+@require_auth
+def add_extra_resources(incident_id):
+    """
+    Manually add extra resources to an existing open/in-progress incident.
+    Triggers Twilio dispatch calls for ONLY the newly assigned resources.
+
+    Request body:
+        {
+            "resources": [
+                { "type": "fire_truck", "count": 2 },
+                { "type": "ambulance", "count": 1 }
+            ]
+        }
+    """
+    try:
+        # ── 1. Validate incident ──────────────────────────────────────────────
+        incident = get_incident_by_id(incident_id)
+        if not incident:
+            return jsonify({"error": "Incident not found"}), 404
+        if incident['status'] == 'closed':
+            return jsonify({"error": "Cannot add resources to a closed incident"}), 400
+
+        body = request.get_json()
+        resource_requests = body.get('resources', [])
+
+        if not resource_requests:
+            return jsonify({"error": "No resources specified"}), 400
+
+        # ── 2. Assign the requested resources ────────────────────────────────
+        assigned    = []
+        unavailable = []
+
+        for req in resource_requests:
+            resource_type = req.get('type', '').strip()
+            count         = int(req.get('count', 1))
+
+            if not resource_type or count < 1:
+                continue
+
+            available = get_available_resources(resource_type, count)
+
+            if not available:
+                unavailable.append({
+                    "type":      resource_type,
+                    "requested": count,
+                    "reason":    "No available resources of this type"
+                })
+                continue
+
+            for resource in available:
+                assign_resource(resource["id"], incident_id)
+                assigned.append({
+                    "id":       resource["id"],
+                    "type":     resource["type"],
+                    "location": resource.get("location", "Unknown")
+                })
+
+            # Partial fulfillment — note the shortfall
+            if len(available) < count:
+                unavailable.append({
+                    "type":      resource_type,
+                    "requested": count,
+                    "fulfilled": len(available),
+                    "reason":    f"Only {len(available)} of {count} available"
+                })
+
+        # ── 3. Twilio dispatch for newly assigned resources only ──────────────
+        call_results = []
+        if assigned:
+            try:
+                from agents.twilio_agent import call_all_responders
+                call_results = call_all_responders(
+                    incident_id=incident_id,
+                    assigned_resources=assigned,
+                    incident_title=incident['title'],
+                    incident_location=incident['location'],
+                    priority=incident['priority'],
+                    incident_description=incident.get('description', '')
+                )
+            except Exception as e:
+                print(f"⚠️ Twilio calling failed for extra resources: {e}")
+
+        return jsonify({
+            "incident_id":    incident_id,
+            "assigned":       assigned,
+            "unavailable":    unavailable,
+            "total_assigned": len(assigned),
+            "calls":          call_results,
+            "message": (
+                f"{len(assigned)} resource(s) added and dispatched."
+                if assigned else
+                "No resources could be assigned — none available."
+            )
+        }), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500

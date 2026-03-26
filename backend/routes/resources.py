@@ -51,24 +51,24 @@ def get_all_for_incident(incident_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @resources_bp.route('/allocate', methods=['POST'])
 @require_auth
 def allocate():
     body = request.get_json()
     incident_id = body.get('incident_id')
-    priority = body.get('priority')
+    resources = body.get('resources')  # e.g. [{ "type": "doctor", "count": 1 }]
 
-    if not incident_id or not priority:
-        return jsonify({"error": "Missing incident_id or priority"}), 400
+    if not incident_id or not resources:
+        return jsonify({"error": "Missing incident_id or resources"}), 400
+
+    if not isinstance(resources, list) or len(resources) == 0:
+        return jsonify({"error": "resources must be a non-empty array"}), 400
 
     try:
-        result = allocate_resources(incident_id, priority)
+        result = allocate_resources(incident_id, resources)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
 @resources_bp.route('/release', methods=['POST'])
 @require_auth
 def release():

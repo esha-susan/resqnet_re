@@ -1,72 +1,95 @@
 // frontend/src/context/AuthContext.jsx
-// Global authentication state using React Context.
-// Wraps the entire app so ANY component can access the current user
-// without passing props down manually.
-
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../api/supabaseClient'
 
-// Create the context object
 const AuthContext = createContext({})
-
-// Custom hook — components call useAuth() to get user/session
 export const useAuth = () => useContext(AuthContext)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [user,    setUser]    = useState(null)
   const [session, setSession] = useState(null)
-  const [loading, setLoading] = useState(true)  // true while we check session
+  const [role,    setRole]    = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  // Fetch role + profile from profiles table
+  const fetchProfile = async (userId) => {
+    if (!userId) { setRole(null); setProfile(null); return }
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('role, full_name, email')
+        .eq('id', userId)
+        .single()
+      setRole(data?.role ?? 'responder')
+      setProfile(data ?? null)
+    } catch {
+      setRole('responder')
+    }
+  }
 
   useEffect(() => {
-    // On app load, check if user already has an active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
+      fetchProfile(session?.user?.id)
       setLoading(false)
     })
 
-    // Listen for login/logout events and update state automatically
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
+        fetchProfile(session?.user?.id)
         setLoading(false)
       }
     )
 
-    // Cleanup listener when component unmounts
     return () => subscription.unsubscribe()
   }, [])
 
-  // Sign up with email + password
-  const signUp = async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({ email, password })
-    return { data, error }
-  }
-
-  // Login with email + password
-  const signIn = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ 
-      email, 
-      password 
+  // signUp passes full_name + role into user metadata
+  // The DB trigger handle_new_user() reads these and inserts into profiles
+  const signUp = async (email, password, fullName, userRole) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          role:      userRole,
+        }
+      }
     })
     return { data, error }
   }
 
-  // Logout
-  const signOut = async () => {
-    await supabase.auth.signOut()
+  const signIn = async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    return { data, error }
   }
 
-  // Get the JWT token for Flask API calls
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    setRole(null)
+    setProfile(null)
+  }
+
   const getToken = async () => {
     const { data: { session } } = await supabase.auth.getSession()
     return session?.access_token
   }
 
-  const value = { user, session, loading, signUp, signIn, signOut, getToken }
+  const isAdmin     = role === 'admin'
+  const isResponder = role !== null && role !== 'admin'
 
-  // Don't render children until we know auth state (prevents flash)
+  const value = {
+    user, session, loading,
+    role, profile,
+    isAdmin, isResponder,
+    signUp, signIn, signOut, getToken,
+  }
+
   return (
     <AuthContext.Provider value={value}>
       {!loading && children}

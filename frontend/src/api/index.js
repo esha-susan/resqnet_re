@@ -1,4 +1,3 @@
-// frontend/src/api/index.js
 import axios from 'axios'
 import { supabase } from './supabaseClient'
 
@@ -70,9 +69,7 @@ export const transcribeAudio = async (audioBlob, incidentId = null) => {
 
 // ── Resources ──
 export const fetchResources = async (status = null) => {
-  const url = status
-    ? `/api/resources?status=${status}`
-    : '/api/resources'
+  const url = status ? `/api/resources?status=${status}` : '/api/resources'
   const res = await API.get(url)
   return res.data
 }
@@ -105,8 +102,6 @@ export const fetchCallLogs = async (incidentId) => {
   const res = await API.get(`/api/twilio/call-logs/${incidentId}`)
   return res.data
 }
-// Add to bottom of existing api/index.js
-// Add to bottom of existing api/index.js
 
 // ── Reports ──
 export const fetchReports = async () => {
@@ -118,10 +113,17 @@ export const fetchReportByIncident = async (incidentId) => {
   const res = await API.get(`/api/reports/${incidentId}`)
   return res.data
 }
-// Add to bottom of existing api/index.js
 
 // ── Dashboard ──
 export const fetchDashboardStats = async () => {
   const res = await API.get('/api/dashboard/stats')
+  return res.data
+}
+
+// ── Add Extra Resources ──
+export const addExtraResources = async (incidentId, resources) => {
+  const res = await API.post(`/api/incidents/${incidentId}/add-resources`, {
+    resources: resources
+  })
   return res.data
 }

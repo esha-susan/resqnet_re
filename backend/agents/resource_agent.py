@@ -4,25 +4,24 @@ from datetime import datetime
 
 RESOURCE_RULES = {
     "Critical": {
-        "ambulance":   2,
-        "fire_truck":  2,
-        "doctor":      2,
-        "police":      2
+        "ambulance":  2,
+        "fire_truck": 2,
+        "doctor":     2,
+        "police":     2
     },
     "High": {
-        "ambulance":   2,
-        "fire_truck":  1,
-        "doctor":      1
+        "ambulance":  2,
+        "fire_truck": 1,
+        "doctor":     1
     },
     "Medium": {
-        "ambulance":   1,
-        "doctor":      1
+        "ambulance": 1,
+        "doctor":    1
     },
     "Low": {
-        "police":      1
+        "police": 1
     }
 }
-
 
 def get_available_resources(resource_type: str, quantity: int) -> list:
     response = (
@@ -34,7 +33,6 @@ def get_available_resources(resource_type: str, quantity: int) -> list:
         .execute()
     )
     return response.data or []
-
 
 def assign_resource(resource_id: str, incident_id: str) -> dict:
     supabase.table("resources").update({
@@ -49,22 +47,19 @@ def assign_resource(resource_id: str, incident_id: str) -> dict:
 
     return response.data[0] if response.data else {}
 
-
 def allocate_resources(incident_id: str, priority: str,
                        incident_title: str = "Incident",
                        incident_location: str = "Unknown",
                        incident_description: str = "") -> dict:
     """
-    Allocates resources and triggers Twilio calls with full incident details.
+    Allocates resources based on priority rules and triggers Twilio calls.
     """
     requirements = RESOURCE_RULES.get(priority, RESOURCE_RULES["Low"])
-
     assigned = []
     unavailable = []
 
     for resource_type, quantity_needed in requirements.items():
         available = get_available_resources(resource_type, quantity_needed)
-
         if not available:
             unavailable.append(resource_type)
             continue
@@ -72,8 +67,8 @@ def allocate_resources(incident_id: str, priority: str,
         for resource in available:
             assign_resource(resource["id"], incident_id)
             assigned.append({
-                "id": resource["id"],
-                "type": resource["type"],
+                "id":       resource["id"],
+                "type":     resource["type"],
                 "location": resource.get("location", "Unknown")
             })
 
@@ -89,23 +84,22 @@ def allocate_resources(incident_id: str, priority: str,
     try:
         from agents.twilio_agent import call_all_responders
         call_results = call_all_responders(
-        incident_id=incident_id,
-        assigned_resources=assigned,
-        incident_title=incident_title,
-        incident_location=incident_location,
-        priority=priority,
-        incident_description=incident_description
-    )
+            incident_id=incident_id,
+            assigned_resources=assigned,
+            incident_title=incident_title,
+            incident_location=incident_location,
+            priority=priority,
+            incident_description=incident_description
+        )
     except Exception as e:
         print(f"⚠️ Twilio calling failed: {e}")
 
     return {
-        "assigned": assigned,
-        "unavailable": unavailable,
+        "assigned":       assigned,
+        "unavailable":    unavailable,
         "total_assigned": len(assigned),
-        "calls": call_results
+        "calls":          call_results
     }
-
 
 def get_incident_resources(incident_id: str) -> list:
     response = (

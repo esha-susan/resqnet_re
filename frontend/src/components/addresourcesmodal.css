@@ -1,0 +1,357 @@
+/* frontend/src/components/addresourcesmodal.css */
+/* Matches the incidentview.css dark theme exactly — no extra dependencies. */
+
+/* ── Overlay ──────────────────────────────────────────────────────────────── */
+.arm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: arm-fade-in 0.18s ease;
+  }
+  
+  @keyframes arm-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  
+  /* ── Modal card ───────────────────────────────────────────────────────────── */
+  .arm-modal {
+    background: rgba(15, 23, 42, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(16px);
+    padding: 2rem;
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: arm-slide-up 0.22s ease;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #ffffff;
+  }
+  
+  @keyframes arm-slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  
+  /* ── Header ───────────────────────────────────────────────────────────────── */
+  .arm-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  
+  .arm-header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+  
+  .arm-header-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  
+  .arm-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+  }
+  
+  .arm-header p {
+    font-size: 0.82rem;
+    color: #94A3B8;
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  .arm-close {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+  .arm-close:hover { color: #ffffff; }
+  
+  /* ── Error banner ─────────────────────────────────────────────────────────── */
+  .arm-error {
+    background: rgba(231, 76, 60, 0.12);
+    border: 1px solid rgba(231, 76, 60, 0.35);
+    color: #ff6b6b;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  /* ── Resource rows ────────────────────────────────────────────────────────── */
+  .arm-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  
+  .arm-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+  }
+  
+  .arm-row-num {
+    font-size: 0.75rem;
+    color: #475569;
+    font-weight: 600;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  
+  .arm-select {
+    flex: 1;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 7px;
+    color: #ffffff;
+    font-size: 0.88rem;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.2rem;
+    transition: border-color 0.15s;
+  }
+  .arm-select:focus { border-color: #0055FF; }
+  .arm-select option { background: #0F172A; }
+  
+  /* ── Count stepper ────────────────────────────────────────────────────────── */
+  .arm-count-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 7px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  
+  .arm-count-btn {
+    background: rgba(30, 41, 59, 0.8);
+    border: none;
+    color: #94A3B8;
+    width: 30px;
+    height: 34px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .arm-count-btn:hover { background: rgba(0, 85, 255, 0.2); color: #fff; }
+  
+  .arm-count-input {
+    width: 38px;
+    text-align: center;
+    background: rgba(15, 23, 42, 0.9);
+    border: none;
+    border-left: 1px solid rgba(255,255,255,0.08);
+    border-right: 1px solid rgba(255,255,255,0.08);
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    height: 34px;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+  .arm-count-input::-webkit-inner-spin-button,
+  .arm-count-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  
+  /* ── Remove row button ────────────────────────────────────────────────────── */
+  .arm-remove {
+    background: transparent;
+    border: none;
+    color: #475569;
+    font-size: 0.85rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.15s;
+    padding: 0.2rem;
+    line-height: 1;
+  }
+  .arm-remove:hover { color: #e74c3c; }
+  
+  /* ── Add row link ─────────────────────────────────────────────────────────── */
+  .arm-add-row {
+    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: #94A3B8;
+    font-size: 0.85rem;
+    padding: 0.65rem;
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .arm-add-row:hover { border-color: #0055FF; color: #ffffff; }
+  
+  /* ── Footer ───────────────────────────────────────────────────────────────── */
+  .arm-footer {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 0.25rem;
+  }
+  
+  .arm-cancel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #94A3B8;
+    border-radius: 8px;
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .arm-cancel:hover { border-color: #fff; color: #fff; }
+  
+  .arm-dispatch {
+    background: #0055FF;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1.6rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .arm-dispatch:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+  .arm-dispatch:disabled             { opacity: 0.55; cursor: not-allowed; }
+  
+  /* ── Result screen ────────────────────────────────────────────────────────── */
+  .arm-result-header {
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+  
+  .arm-result-icon {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .arm-result-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+  }
+  
+  .arm-result-sub {
+    color: #94A3B8;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+  
+  .arm-result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .arm-result-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin: 0;
+  }
+  
+  .arm-label-warn { color: #e67e22; }
+  
+  .arm-result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  
+  .arm-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .arm-result-ok {
+    background: rgba(46, 204, 113, 0.1);
+    border: 1px solid rgba(46, 204, 113, 0.2);
+  }
+  
+  .arm-result-warn {
+    background: rgba(230, 126, 34, 0.1);
+    border: 1px solid rgba(230, 126, 34, 0.2);
+  }
+  
+  .arm-mini-icon {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 0.2rem 0.45rem;
+    flex-shrink: 0;
+  }
+  
+  .arm-result-type {
+    font-weight: 700;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+  }
+  
+  .arm-result-loc,
+  .arm-result-reason {
+    font-size: 0.78rem;
+    color: #94A3B8;
+    margin-left: auto;
+    text-align: right;
+  }
+  
+  .arm-done-btn {
+    background: #0055FF;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .arm-done-btn:hover { opacity: 0.88; }

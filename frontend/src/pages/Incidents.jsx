@@ -1,6 +1,7 @@
 // frontend/src/pages/Incidents.jsx
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext' // ✅ ADDED
 import Navbar from '../components/Navbar'
 import IncidentCard from '../components/IncidentCard'
 import SpeechRecorder from '../components/SpeechRecorder'
@@ -11,7 +12,9 @@ import '../styles/speech.css'
 const PRIORITIES = ['Low', 'Medium', 'High', 'Critical']
 
 function Incidents() {
-  const navigate = useNavigate() // ✅ Added useNavigate
+  const navigate = useNavigate()
+  const { role } = useAuth() // ✅ ADDED
+
   const [incidents, setIncidents] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -105,96 +108,100 @@ function Incidents() {
       <Navbar />
       <div className="incidents-container">
 
-        <section className="incident-form-section">
-          <h2 className="section-title">Report New Incident</h2>
-          <p className="section-sub">
-            Priority is automatically assigned by the AI — you can override it after submission
-          </p>
+        {/* ✅ FORM ONLY FOR ADMIN */}
+        {role === 'admin' && (
+          <section className="incident-form-section">
+            <h2 className="section-title">Report New Incident</h2>
+            <p className="section-sub">
+              Priority is automatically assigned by the AI — you can override it after submission
+            </p>
 
-          {error && <div className="form-error">{error}</div>}
-          {success && <div className="form-success">{success}</div>}
+            {error && <div className="form-error">{error}</div>}
+            {success && <div className="form-success">{success}</div>}
 
-          {showOverride && autoPriority && (
-            <div className="priority-result-box">
-              <div className="priority-result-header">
-                <span>AI assigned priority:</span>
-                <span className={`priority-result-badge badge-${autoPriority.toLowerCase()}`}>
-                  {overridePriority || autoPriority}
-                </span>
-              </div>
-              <div className="override-section">
-                <span className="override-label">Override if incorrect:</span>
-                <div className="override-buttons">
-                  {PRIORITIES.map(p => (
-                    <button
-                      key={p}
-                      type="button"
-                      className={`override-btn override-btn-${p.toLowerCase()} 
-                        ${(overridePriority || autoPriority) === p ? 'active' : ''}`}
-                      onClick={() => handleOverride(p)}
-                    >
-                      {p}
-                    </button>
-                  ))}
+            {showOverride && autoPriority && (
+              <div className="priority-result-box">
+                <div className="priority-result-header">
+                  <span>AI assigned priority:</span>
+                  <span className={`priority-result-badge badge-${autoPriority.toLowerCase()}`}>
+                    {overridePriority || autoPriority}
+                  </span>
+                </div>
+                <div className="override-section">
+                  <span className="override-label">Override if incorrect:</span>
+                  <div className="override-buttons">
+                    {PRIORITIES.map(p => (
+                      <button
+                        key={p}
+                        type="button"
+                        className={`override-btn override-btn-${p.toLowerCase()} 
+                          ${(overridePriority || autoPriority) === p ? 'active' : ''}`}
+                        onClick={() => handleOverride(p)}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <form onSubmit={handleSubmit} className="incident-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label>Incident Title *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Building Fire on Main Street"
-                  value={title}
-                  onChange={e => setTitle(e.target.value)}
-                  required
-                />
+            <form onSubmit={handleSubmit} className="incident-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Incident Title *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Building Fire on Main Street"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Location *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 123 Main St, District 4"
+                    value={location}
+                    onChange={e => setLocation(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-              <div className="form-group">
-                <label>Location *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 123 Main St, District 4"
-                  value={location}
-                  onChange={e => setLocation(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
 
-            <SpeechRecorder
-              onTranscript={handleTranscript}
-              disabled={submitting}
-            />
-
-            <div className="form-group">
-              <label>Description * (or use Voice Report above)</label>
-              <textarea
-                placeholder="Describe what is happening... The AI will auto-assign priority based on your description."
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                rows={4}
-                required
+              <SpeechRecorder
+                onTranscript={handleTranscript}
+                disabled={submitting}
               />
-            </div>
 
-            <div className="ai-notice">
-              Priority will be automatically determined from your description
-            </div>
+              <div className="form-group">
+                <label>Description *</label>
+                <textarea
+                  placeholder="Describe what is happening..."
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  rows={4}
+                  required
+                />
+              </div>
 
-            <button
-              type="submit"
-              className="submit-incident-btn"
-              disabled={submitting}
-            >
-              {submitting ? 'Analyzing & Reporting...' : 'Report Incident'}
-            </button>
-          </form>
-        </section>
+              <div className="ai-notice">
+                Priority will be automatically determined
+              </div>
 
+              <button
+                type="submit"
+                className="submit-incident-btn"
+                disabled={submitting}
+              >
+                {submitting ? 'Analyzing & Reporting...' : 'Report Incident'}
+              </button>
+            </form>
+          </section>
+        )}
+
+        {/* ✅ INCIDENT LIST (VISIBLE TO ALL) */}
         <section className="incident-list-section">
           <div className="list-header">
             <h2 className="section-title">Active Incidents</h2>
@@ -206,7 +213,7 @@ function Incidents() {
           ) : incidents.length === 0 ? (
             <div className="empty-state">
               <p>No incidents reported yet.</p>
-              <p>Use the form above to report the first one.</p>
+              {role === 'admin' && <p>Use the form above to report the first one.</p>}
             </div>
           ) : (
             <div className="incident-list">

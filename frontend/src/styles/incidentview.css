@@ -349,3 +349,38 @@
   }
   
   .iv-view-report-btn:hover { opacity: 0.9; }
+  /* ─────────────────────────────────────────────────────────────────────────────
+   APPEND these rules to the bottom of frontend/src/styles/incidentview.css
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Section header with action button ── */
+/* Change the existing .iv-section-header to allow actions on the right side.
+   The existing rule already has display:flex + align-items:center, so just
+   add the new child container and button below. */
+
+.iv-section-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ── Add Resources button ── */
+.iv-add-resources-btn {
+  background: rgba(0, 85, 255, 0.15);
+  border: 1px solid rgba(0, 85, 255, 0.45);
+  color: #5b9bff;
+  padding: 0.35rem 0.95rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  letter-spacing: 0.01em;
+}
+
+.iv-add-resources-btn:hover {
+  background: rgba(0, 85, 255, 0.28);
+  border-color: #0055FF;
+  color: #ffffff;
+}

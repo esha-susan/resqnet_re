@@ -1,49 +1,43 @@
+# backend/routes/twilio_webhook.py
 from flask import Blueprint, request, Response, jsonify
 from services import supabase
 
 twilio_bp = Blueprint('twilio', __name__, url_prefix='/api/twilio')
 
 
-# ✅ STEP 1: Initial call (no double speaking)
 @twilio_bp.route('/response', methods=['POST'])
 def initial_call():
+    """
+    Step 1: Twilio calls this when the responder picks up.
+    Plays the emergency message and waits for keypress.
+    """
     call_sid = request.form.get('CallSid', '')
-
-    print(f"🔥 Initial Twilio webhook hit: {call_sid}")
-
-    # ✅ Prevent duplicate execution
-    if hasattr(initial_call, "last_sid") and initial_call.last_sid == call_sid:
-        print("⚠️ Duplicate call detected, ignoring")
-        return Response(
-            '<?xml version="1.0"?><Response></Response>',
-            mimetype='text/xml'
-        )
-
-    initial_call.last_sid = call_sid
+    print(f"🔥 Twilio webhook hit — CallSid: {call_sid}")
 
     twiml = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Gather 
-        numDigits="1" 
-        action="/api/twilio/handle-input" 
-        method="POST"
-        timeout="5"
-    >
+    <Gather numDigits="1" action="/api/twilio/handle-input" method="POST" timeout="10">
         <Say voice="alice">
-            This is an emergency alert. Press 1 to confirm availability. Press 2 if unavailable.
+            This is an emergency alert from Res Q Net.
+            Press 1 to confirm availability.
+            Press 2 if you are unavailable.
         </Say>
     </Gather>
     <Hangup/>
 </Response>"""
 
-    return Response(twiml, mimetype='text/xml')
-# ✅ STEP 2: Handle keypad input (including no input)
+    return Response(twiml, mimetype='text/xml', status=200)
+
+
 @twilio_bp.route('/handle-input', methods=['POST'])
 def handle_response():
-    print("🔥 Twilio input received")
-
+    """
+    Step 2: Twilio calls this when responder presses a key.
+    Updates call_logs with confirmed/unavailable/no_answer.
+    """
     digits   = request.form.get('Digits', '')
     call_sid = request.form.get('CallSid', '')
+    print(f"🔥 Keypress received — Digits: {digits} CallSid: {call_sid}")
 
     if digits == '1':
         status  = 'confirmed'
@@ -53,29 +47,30 @@ def handle_response():
         message = 'You have been marked as unavailable. Dispatch will assign another unit.'
     else:
         status  = 'no_answer'
-        message = 'No input received. Goodbye.'
+        message = 'No input received. Please contact dispatch directly.'
 
-    # ✅ Update DB safely
+    # Update call log in database
     if call_sid:
         try:
             supabase.table("call_logs").update({
                 "status": status
             }).eq("call_sid", call_sid).execute()
+            print(f"✅ Call {call_sid} marked as {status}")
         except Exception as e:
-            print(f"⚠️ DB error: {e}")
+            print(f"⚠️ DB update error: {e}")
 
-    twiml = f"""<?xml version="1.0" encoding="UTF-8"?>
+    twiml = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Say voice="alice">{message}</Say>
+    <Say voice="alice">{}</Say>
     <Hangup/>
-</Response>"""
+</Response>""".format(message)
 
     return Response(twiml, mimetype='text/xml', status=200)
 
 
-# ✅ Existing API (unchanged)
 @twilio_bp.route('/call-logs/<incident_id>', methods=['GET'])
 def get_call_logs(incident_id):
+    """Returns all call logs for a specific incident."""
     try:
         response = (
             supabase.table("call_logs")
