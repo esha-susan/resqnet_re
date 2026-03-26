@@ -9,7 +9,7 @@ const ROLES = [
   { value: 'admin',     label: 'Admin',         icon: '', desc: 'Full system access'          },
   { value: 'police',    label: 'Police',         icon: '', desc: 'Law enforcement response'    },
   { value: 'ambulance', label: 'Ambulance',      icon: '', desc: 'Medical emergency response'  },
-  { value: 'fire_truck',label: 'Fire & Rescue',  icon: '', desc: 'Fire suppression & rescue'   },
+  { value: 'fireforce',label: 'Fire & Rescue',  icon: '', desc: 'Fire suppression & rescue'   },
   { value: 'doctor',    label: 'Doctor',         icon: '', desc: 'Medical team on-site'        },
 ]
 

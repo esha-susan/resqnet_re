@@ -114,6 +114,28 @@ export const fetchReportByIncident = async (incidentId) => {
   return res.data
 }
 
+/**
+ * Generates and downloads a PDF analytics report.
+ * @param {'weekly'|'monthly'} range
+ */
+export const generateReport = async (range = 'weekly') => {
+  const res = await API.post(
+    '/api/reports/generate',
+    { range },
+    { responseType: 'blob' }
+  )
+
+  // Trigger browser download
+  const url      = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+  const link     = document.createElement('a')
+  link.href      = url
+  link.download  = `resqnet_${range}_report.pdf`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
+
 // ── Dashboard ──
 export const fetchDashboardStats = async () => {
   const res = await API.get('/api/dashboard/stats')
