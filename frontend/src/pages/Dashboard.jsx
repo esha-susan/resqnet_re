@@ -27,7 +27,7 @@ const ROLE_CONFIG = {
   admin:     { label: 'Command Center',    color: '#0055FF', icon: '', accent: 'rgba(0,85,255,0.15)'   },
   police:    { label: 'Police Dashboard',  color: '#6366f1', icon: '', accent: 'rgba(99,102,241,0.15)' },
   ambulance: { label: 'Ambulance Hub',     color: '#ef4444', icon: '', accent: 'rgba(239,68,68,0.15)'  },
-  fire_truck:{ label: 'Fire & Rescue Hub', color: '#f97316', icon: '', accent: 'rgba(249,115,22,0.15)' },
+  fireforce: { label: 'Fire & Rescue Hub', color: '#f97316', icon: '', accent: 'rgba(249,115,22,0.15)' },
   doctor:    { label: 'Medical Dashboard', color: '#10b981', icon: '', accent: 'rgba(16,185,129,0.15)' },
 }
 
@@ -110,12 +110,10 @@ function GenerateReportButton({ accentColor }) {
 
       {open && (
         <>
-          {/* Backdrop */}
           <div
             onClick={() => setOpen(false)}
             style={{ position: 'fixed', inset: 0, zIndex: 99 }}
           />
-          {/* Dropdown */}
           <div style={{
             position:     'absolute',
             top:          'calc(100% + 8px)',
@@ -129,8 +127,8 @@ function GenerateReportButton({ accentColor }) {
             overflow:     'hidden',
           }}>
             {[
-              { label: '📅  Weekly Report',  range: 'weekly'  },
-              { label: '📆  Monthly Report', range: 'monthly' },
+              { label: 'Weekly Report',  range: 'weekly'  },
+              { label: 'Monthly Report', range: 'monthly' },
             ].map(opt => (
               <button
                 key={opt.range}
@@ -310,21 +308,21 @@ function ResponderDashboard({ stats, role, profile, navigate, loadStats, refresh
           </div>
 
           <div className="db-stat-card">
-            <div className="db-stat-header">
-              <div className="db-stat-icon-wrapper" style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981' }}>
-                <Icons.Truck />
-              </div>
-              <span className="db-stat-label">My Unit Resources</span>
-            </div>
-            <span className="db-stat-number" style={{ color: myResources.available > 0 ? '#10b981' : '#ef4444' }}>
-              {myResources.available}
-            </span>
-            <div className="db-stat-sub">
-              <span><span className="db-value-dot dot-green" />{myResources.available} Available</span>
-              <span><span className="db-value-dot dot-red"   />{myResources.busy}      Deployed</span>
-            </div>
-          </div>
-
+  <div className="db-stat-header">
+    <div className="db-stat-icon-wrapper" style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981' }}>
+      <Icons.Truck />
+    </div>
+    <span className="db-stat-label">My Unit Resources</span>
+  </div>
+  <span className="db-stat-number" style={{ color: '#10b981' }}>
+    {myResources.available}
+  </span>
+  <div className="db-stat-sub">
+    <span><span className="db-value-dot dot-green" />{myResources.available} Available</span>
+    <span><span className="db-value-dot dot-blue"  />{myResources.busy} Deployed</span>
+    <span><span className="db-value-dot" style={{background:'#94A3B8'}} />{myResources.total} Total</span>
+  </div>
+</div>
           <div className="db-stat-card">
             <div className="db-stat-header">
               <div className="db-stat-icon-wrapper" style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8' }}>
@@ -384,7 +382,7 @@ function ResponderDashboard({ stats, role, profile, navigate, loadStats, refresh
                     <YAxis stroke="#64748B" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                     <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} {...TOOLTIP_STYLE} />
                     <Bar dataKey="Available" stackId="a" fill="#10b981" radius={[0, 0, 4, 4]} />
-                    <Bar dataKey="Deployed"  stackId="a" fill={cfg.color} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Deployed"  stackId="a" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -397,7 +395,7 @@ function ResponderDashboard({ stats, role, profile, navigate, loadStats, refresh
                   <span style={{ width: 10, height: 10, borderRadius: '2px', background: '#10b981', display: 'inline-block' }} />Available
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#94A3B8' }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '2px', background: cfg.color, display: 'inline-block' }} />Deployed
+                  <span style={{ width: 10, height: 10, borderRadius: '2px', background: '#3b82f6', display: 'inline-block' }} />Deployed
                 </span>
               </div>
             )}
