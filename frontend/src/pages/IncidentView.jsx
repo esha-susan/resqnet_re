@@ -25,10 +25,17 @@ const RESOURCE_ICONS = {
   police:     'POL',
 }
 
+const ROLE_RESOURCE_MAP = {
+  ambulance:  'ambulance',
+  fireforce:  'fire_truck',
+  doctor:     'doctor',
+  police:     'police',
+}
+
 function IncidentView() {
   const { id }       = useParams()
   const navigate     = useNavigate()
-  const { isAdmin }  = useAuth()          // ← role gate
+  const { isAdmin, role }  = useAuth()
 
   const [incident,     setIncident]     = useState(null)
   const [resources,    setResources]    = useState([])
@@ -192,8 +199,8 @@ function IncidentView() {
                   <span className="iv-assigned-time">
                     Assigned: {formatDate(item.assigned_at)}
                   </span>
-                  {/* Admin only: Release button */}
-                  {isAdmin && incident.status !== 'closed' && (
+                  {/* Admin or matched role: Release button */}
+                  {(isAdmin || ROLE_RESOURCE_MAP[role] === item.resources?.type) && incident.status !== 'closed' && (
                     <button
                       className="iv-release-btn"
                       onClick={() => handleReleaseResource(item.resources?.id)}
@@ -257,7 +264,7 @@ function IncidentView() {
         {/* ── Responder read-only notice ── */}
         {!isAdmin && incident.status !== 'closed' && (
           <div className="iv-responder-notice">
-            <span>👁 You are viewing this incident as a responder. Contact your admin to make changes.</span>
+            <span>👁 You are viewing this incident as a responder. You can only release resources corresponding to your unit.</span>
           </div>
         )}
 

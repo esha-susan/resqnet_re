@@ -1,0 +1,15 @@
+Exception details:
+Traceback (most recent call last):
+  File "C:\Users\SREESUTHA\resqnet_re\backend\test_add_more.py", line 32, in test_add_more
+    result = allocate_additional_resources(incident_id, additional)
+  File "C:\Users\SREESUTHA\resqnet_re\backend\agents\resource_agent.py", line 142, in allocate_additional_resources
+    assign_resource(resource["id"], incident_id, assignment_type="reinforcement")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SREESUTHA\resqnet_re\backend\agents\resource_agent.py", line 49, in assign_resource
+    }).execute()
+       ~~~~~~~^^
+  File "C:\Users\SREESUTHA\resqnet_re\backend\venv\Lib\site-packages\postgrest\_sync\request_builder.py", line 53, in execute
+    raise APIError(dict(json_obj))
+postgrest.exceptions.APIError: {'message': "Could not find the 'assignment_type' column of 'incident_resources' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+
+Error during allocation: {'message': "Could not find the 'assignment_type' column of 'incident_resources' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}

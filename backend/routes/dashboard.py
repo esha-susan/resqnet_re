@@ -108,10 +108,13 @@ def get_stats():
                 resource_types[r_type]["busy"] += 1
 
         # ───── Call Stats ─────
+        filtered_calls = calls if is_admin else [c for c in calls if c.get("incident_id") in incident_ids]
+        
         call_stats = {
-            "total":     len(calls),
-            "confirmed": len([c for c in calls if c["status"] == "confirmed"]),
-            "no_answer": len([c for c in calls if c["status"] == "no_answer"]),
+            "total":     len(filtered_calls),
+            "pending":   len([c for c in filtered_calls if c["status"] == "initiated"]),
+            "confirmed": len([c for c in filtered_calls if c["status"] == "confirmed"]),
+            "no_answer": len([c for c in filtered_calls if c["status"] == "no_answer"]),
         }
 
         # ───── Recent Incidents ─────

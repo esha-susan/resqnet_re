@@ -2,9 +2,11 @@
 import threading
 from flask import Blueprint, jsonify, request
 from middleware.auth_middleware import require_auth
+from services.auth_service import get_user_profile
 from services.incident_service import (
     create_incident,
     get_all_incidents,
+    get_incidents_for_role,
     get_incident_by_id,
     update_incident_status,
     update_incident_priority
@@ -71,7 +73,13 @@ def create():
 @require_auth
 def get_all():
     try:
-        return jsonify(get_all_incidents()), 200
+        profile = get_user_profile(request.current_user)
+        role = profile.get("role")
+        
+        if role == "admin":
+            return jsonify(get_all_incidents()), 200
+        else:
+            return jsonify(get_incidents_for_role(role)), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

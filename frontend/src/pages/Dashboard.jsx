@@ -332,6 +332,7 @@ function ResponderDashboard({ stats, role, profile, navigate, loadStats, refresh
             </div>
             <span className="db-stat-number">{myCalls.total}</span>
             <div className="db-stat-sub">
+              <span><span className="db-value-dot dot-orange" />{myCalls.pending || 0} Pending</span>
               <span><span className="db-value-dot dot-green" />{myCalls.confirmed} Confirmed</span>
               <span><span className="db-value-dot dot-red"   />{myCalls.no_answer} Missed</span>
             </div>
@@ -531,6 +532,7 @@ function AdminDashboard({ stats, user, navigate, loadStats, refreshing, lastUpda
             </div>
             <span className="db-stat-number">{stats?.calls?.total || 0}</span>
             <div className="db-stat-sub">
+              <span><span className="db-value-dot dot-orange" />{stats?.calls?.pending || 0} Pending</span>
               <span><span className="db-value-dot dot-green" />{stats?.calls?.confirmed || 0} Confirmed</span>
               <span><span className="db-value-dot dot-red"   />{stats?.calls?.no_answer || 0} Missed</span>
             </div>

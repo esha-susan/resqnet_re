@@ -37,6 +37,51 @@ def get_all_incidents():
     return response.data
 
 
+def get_incidents_for_role(role: str):
+    ROLE_RESOURCE_MAP = {
+        "fireforce": "fire_truck",
+        "ambulance": "ambulance",
+        "doctor":    "doctor",
+        "police":    "police",
+    }
+    
+    resource_type = ROLE_RESOURCE_MAP.get(role)
+    if not resource_type:
+        return []
+
+    # Get all resource IDs of this role's type
+    res = (
+        supabase.table("resources")
+        .select("id")
+        .eq("type", resource_type)
+        .execute()
+    )
+    resource_ids = [r["id"] for r in (res.data or [])]
+    if not resource_ids:
+        return []
+
+    # Get ALL incident IDs ever linked to these resources (including released)
+    ir = (
+        supabase.table("incident_resources")
+        .select("incident_id")
+        .in_("resource_id", resource_ids)
+        .execute()
+    )
+    incident_ids = list({row["incident_id"] for row in (ir.data or [])})
+    
+    if not incident_ids:
+        return []
+        
+    response = (
+        supabase.table("incidents")
+        .select("*")
+        .in_("id", incident_ids)
+        .order("created_at", desc=True)
+        .execute()
+    )
+    return response.data
+
+
 def get_incident_by_id(incident_id):
     response = (
         supabase.table("incidents")
