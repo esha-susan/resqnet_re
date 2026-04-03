@@ -29,8 +29,8 @@ const emptyRow = () => ({ type: 'fire_truck', count: 1, _id: Math.random() })
  *   onClose     {function} — called when the modal should close
  *   onSuccess   {function} — called with the API result when dispatch succeeds
  */
-export default function AddResourcesModal({ incidentId, onClose, onSuccess }) {
-  const [rows,        setRows]        = useState([emptyRow()])
+export default function AddResourcesModal({ incidentId, onClose, onSuccess, fixedType = null }) {
+  const [rows,        setRows]        = useState([fixedType ? { type: fixedType, count: 1, _id: Math.random() } : emptyRow()])
   const [submitting,  setSubmitting]  = useState(false)
   const [result,      setResult]      = useState(null)   // success result
   const [error,       setError]       = useState('')
@@ -136,8 +136,8 @@ export default function AddResourcesModal({ incidentId, onClose, onSuccess }) {
           <div className="arm-header-left">
             <span className="arm-header-icon">🚨</span>
             <div>
-              <h3>Add Extra Resources</h3>
-              <p>Select types and quantities — responders will be called immediately.</p>
+              <h3>{fixedType ? 'Request Extra Resource' : 'Add Extra Resources'}</h3>
+              <p>{fixedType ? 'Select quantity — responders will be called immediately.' : 'Select types and quantities — responders will be called immediately.'}</p>
             </div>
           </div>
           <button className="arm-close" onClick={onClose} aria-label="Close">✕</button>
@@ -152,17 +152,23 @@ export default function AddResourcesModal({ incidentId, onClose, onSuccess }) {
             <div key={row._id} className="arm-row">
               <span className="arm-row-num">{idx + 1}</span>
 
-              <select
-                className="arm-select"
-                value={row.type}
-                onChange={e => updateRow(row._id, 'type', e.target.value)}
-              >
-                {RESOURCE_TYPE_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              {fixedType ? (
+                <div className="arm-select-fixed">
+                  {RESOURCE_TYPE_OPTIONS.find(opt => opt.value === fixedType)?.label || fixedType}
+                </div>
+              ) : (
+                <select
+                  className="arm-select"
+                  value={row.type}
+                  onChange={e => updateRow(row._id, 'type', e.target.value)}
+                >
+                  {RESOURCE_TYPE_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              )}
 
               <div className="arm-count-wrap">
                 <button
@@ -185,7 +191,7 @@ export default function AddResourcesModal({ incidentId, onClose, onSuccess }) {
                 >+</button>
               </div>
 
-              {rows.length > 1 && (
+              {!fixedType && rows.length > 1 && (
                 <button
                   className="arm-remove"
                   onClick={() => removeRow(row._id)}
@@ -197,9 +203,11 @@ export default function AddResourcesModal({ incidentId, onClose, onSuccess }) {
         </div>
 
         {/* Add another row */}
-        <button className="arm-add-row" onClick={addRow}>
-          + Add another resource type
-        </button>
+        {!fixedType && (
+          <button className="arm-add-row" onClick={addRow}>
+            + Add another resource type
+          </button>
+        )}
 
         {/* Footer actions */}
         <div className="arm-footer">

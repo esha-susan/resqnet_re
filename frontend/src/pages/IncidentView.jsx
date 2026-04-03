@@ -45,6 +45,7 @@ function IncidentView() {
   const [error,        setError]        = useState('')
   const [success,      setSuccess]      = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [addModalFixedType, setAddModalFixedType] = useState(null)
 
   useEffect(() => { loadAll() }, [id])
 
@@ -171,9 +172,24 @@ function IncidentView() {
               {isAdmin && incident.status !== 'closed' && (
                 <button
                   className="iv-add-resources-btn"
-                  onClick={() => setShowAddModal(true)}
+                  onClick={() => {
+                    setAddModalFixedType(null)
+                    setShowAddModal(true)
+                  }}
                 >
                   + Add Resources
+                </button>
+              )}
+              {/* Responder: Request Extra Resource of their own type */}
+              {!isAdmin && incident.status !== 'closed' && ROLE_RESOURCE_MAP[role] && (
+                <button
+                  className="iv-add-resources-btn"
+                  onClick={() => {
+                    setAddModalFixedType(ROLE_RESOURCE_MAP[role])
+                    setShowAddModal(true)
+                  }}
+                >
+                  + Extra Resource
                 </button>
               )}
             </div>
@@ -290,6 +306,7 @@ function IncidentView() {
       {showAddModal && (
         <AddResourcesModal
           incidentId={id}
+          fixedType={addModalFixedType}
           onClose={() => setShowAddModal(false)}
           onSuccess={(result) => {
             handleResourcesAdded(result)
